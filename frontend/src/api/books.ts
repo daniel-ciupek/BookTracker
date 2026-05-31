@@ -1,4 +1,5 @@
 import type { AddBookPayload, Book, BooksResponse } from '../types/book'
+import { clearToken, getToken } from './auth'
 
 const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 
@@ -11,10 +12,22 @@ export class ValidationError extends Error {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const token = getToken()
   const res = await fetch(`${BASE}${path}`, {
     ...init,
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json', ...init?.headers },
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...init?.headers,
+    },
   })
+
+  if (res.status === 401) {
+    clearToken()
+    window.location.reload()
+    throw new Error('Unauthorized')
+  }
 
   if (res.status === 422) {
     const body = await res.json()

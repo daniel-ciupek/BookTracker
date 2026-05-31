@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Faker\Factory as FakerFactory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -10,6 +11,11 @@ class BookSeeder extends Seeder
 {
     public function run(): void
     {
+        $user = User::firstOrCreate(
+            ['email' => 'demo@example.com'],
+            ['name' => 'Demo User', 'password' => 'password']
+        );
+
         $count = (int) env('SEED_COUNT', 10000);
         $faker = FakerFactory::create();
         $chunkSize = 1000;
@@ -17,6 +23,7 @@ class BookSeeder extends Seeder
 
         for ($i = 0; $i < $count; $i++) {
             $batch[] = [
+                'user_id' => $user->id,
                 'title' => $faker->sentence(rand(2, 6), false),
                 'author' => $faker->name(),
                 'isbn' => rand(0, 3) > 0 ? $faker->isbn13() : null,

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
+import { IconX } from '@tabler/icons-react'
 
 type ApiError = { message?: string; errors?: Record<string, string[]> }
 
@@ -76,30 +77,30 @@ export function SettingsPage({ onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 px-4 py-6 backdrop-blur-sm transition-all"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+        className="relative w-full max-w-md overflow-y-auto rounded-3xl bg-white p-8 shadow-soft-lg dark:border dark:border-slate-800 dark:bg-slate-850"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-full bg-gray-100 p-1.5 text-gray-500 hover:bg-gray-200"
+          className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
           aria-label="Zamknij"
         >
-          ✕
+          <IconX size={20} stroke={2.5} />
         </button>
 
-        <h2 className="mb-6 text-xl font-bold text-gray-900">Ustawienia</h2>
+        <h2 className="mb-8 text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">Ustawienia</h2>
 
         {/* Profile section */}
-        <section className="mb-6">
-          <h3 className="mb-3 text-sm font-semibold text-gray-700">Profil</h3>
-          <form onSubmit={handleProfileSubmit} className="space-y-3">
+        <section className="mb-8">
+          <h3 className="mb-4 text-base font-bold text-slate-800 dark:text-slate-200">Twój profil</h3>
+          <form onSubmit={handleProfileSubmit} className="space-y-4">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Imię</label>
+              <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400">Imię</label>
               <input
                 type="text"
                 value={profileName}
@@ -107,11 +108,11 @@ export function SettingsPage({ onClose }: Props) {
                 className={inp(!!profileErrors['name'])}
               />
               {profileErrors['name'] && (
-                <p className="mt-1 text-xs text-red-600">{profileErrors['name']}</p>
+                <p className="mt-1.5 pl-1 text-xs font-medium text-red-500">{profileErrors['name']}</p>
               )}
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">E-mail</label>
+              <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400">E-mail</label>
               <input
                 type="email"
                 value={profileEmail}
@@ -119,31 +120,31 @@ export function SettingsPage({ onClose }: Props) {
                 className={inp(!!profileErrors['email'])}
               />
               {profileErrors['email'] && (
-                <p className="mt-1 text-xs text-red-600">{profileErrors['email']}</p>
+                <p className="mt-1.5 pl-1 text-xs font-medium text-red-500">{profileErrors['email']}</p>
               )}
             </div>
             {profileErrors['_'] && (
-              <p className="text-sm text-red-600">{profileErrors['_']}</p>
+              <p className="text-sm font-medium text-red-500">{profileErrors['_']}</p>
             )}
-            {profileSuccess && <p className="text-sm text-green-600">{profileSuccess}</p>}
+            {profileSuccess && <p className="text-sm font-medium text-emerald-500">{profileSuccess}</p>}
             <button
               type="submit"
               disabled={profileLoading}
-              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+              className="mt-2 w-full rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-indigo-700 hover:shadow-soft disabled:opacity-50"
             >
               {profileLoading ? 'Zapisywanie…' : 'Zapisz profil'}
             </button>
           </form>
         </section>
 
-        <hr className="mb-6 border-gray-200" />
+        <hr className="mb-8 border-slate-100 dark:border-slate-800" />
 
         {/* Password section */}
         <section>
-          <h3 className="mb-3 text-sm font-semibold text-gray-700">Zmiana hasła</h3>
-          <form onSubmit={handlePasswordSubmit} className="space-y-3">
+          <h3 className="mb-4 text-base font-bold text-slate-800 dark:text-slate-200">Zmień hasło</h3>
+          <form onSubmit={handlePasswordSubmit} className="space-y-4">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400">
                 Obecne hasło
               </label>
               <input
@@ -153,11 +154,11 @@ export function SettingsPage({ onClose }: Props) {
                 className={inp(!!passwordErrors['current_password'])}
               />
               {passwordErrors['current_password'] && (
-                <p className="mt-1 text-xs text-red-600">{passwordErrors['current_password']}</p>
+                <p className="mt-1.5 pl-1 text-xs font-medium text-red-500">{passwordErrors['current_password']}</p>
               )}
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Nowe hasło</label>
+              <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400">Nowe hasło</label>
               <input
                 type="password"
                 value={newPassword}
@@ -166,11 +167,11 @@ export function SettingsPage({ onClose }: Props) {
                 className={inp(!!passwordErrors['password'])}
               />
               {passwordErrors['password'] && (
-                <p className="mt-1 text-xs text-red-600">{passwordErrors['password']}</p>
+                <p className="mt-1.5 pl-1 text-xs font-medium text-red-500">{passwordErrors['password']}</p>
               )}
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400">
                 Powtórz nowe hasło
               </label>
               <input
@@ -180,17 +181,17 @@ export function SettingsPage({ onClose }: Props) {
                 className={inp(!!passwordErrors['confirm'])}
               />
               {passwordErrors['confirm'] && (
-                <p className="mt-1 text-xs text-red-600">{passwordErrors['confirm']}</p>
+                <p className="mt-1.5 pl-1 text-xs font-medium text-red-500">{passwordErrors['confirm']}</p>
               )}
             </div>
             {passwordErrors['_'] && (
-              <p className="text-sm text-red-600">{passwordErrors['_']}</p>
+              <p className="text-sm font-medium text-red-500">{passwordErrors['_']}</p>
             )}
-            {passwordSuccess && <p className="text-sm text-green-600">{passwordSuccess}</p>}
+            {passwordSuccess && <p className="text-sm font-medium text-emerald-500">{passwordSuccess}</p>}
             <button
               type="submit"
               disabled={passwordLoading}
-              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+              className="mt-2 w-full rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-slate-800 hover:shadow-soft disabled:opacity-50 dark:bg-slate-700 dark:hover:bg-slate-600"
             >
               {passwordLoading ? 'Zmienianie…' : 'Zmień hasło'}
             </button>
@@ -203,9 +204,9 @@ export function SettingsPage({ onClose }: Props) {
 
 function inp(hasError: boolean) {
   return [
-    'w-full rounded-lg border px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1',
+    'w-full rounded-xl border bg-slate-50/50 px-4 py-2.5 text-sm font-medium shadow-sm transition-colors focus:outline-none focus:ring-2 dark:bg-slate-900/50 dark:text-slate-200 dark:placeholder-slate-500',
     hasError
-      ? 'border-red-400 focus:border-red-500 focus:ring-red-500'
-      : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500',
+      ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
+      : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 dark:border-slate-700',
   ].join(' ')
 }

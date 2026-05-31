@@ -29,7 +29,7 @@ describe('SettingsPage', () => {
 
   it('renderuje formularz zmiany hasła', () => {
     render(<SettingsPage onClose={vi.fn()} />)
-    expect(screen.getByText('Zmiana hasła')).toBeInTheDocument()
+    expect(screen.getAllByText('Zmień hasło')[0]).toBeInTheDocument()
     expect(screen.getByPlaceholderText(/min\. 8 znaków/)).toBeInTheDocument()
   })
 

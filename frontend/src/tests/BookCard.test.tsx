@@ -46,18 +46,17 @@ describe('BookCard', () => {
 
   it('wyświetla badge gatunku', () => {
     renderCard(mockBook({ genre: 'Fantastyka' }))
-    expect(screen.getByText('Fantastyka')).toBeInTheDocument()
+    expect(screen.getByText('FANTASTYKA')).toBeInTheDocument()
   })
 
   it('nie wyświetla badge gatunku gdy brak', () => {
     renderCard(mockBook({ genre: null }))
-    expect(screen.queryByText('Fantastyka')).not.toBeInTheDocument()
+    expect(screen.queryByText('FANTASTYKA')).not.toBeInTheDocument()
   })
 
   it('wyświetla placeholder gdy brak ISBN', () => {
     renderCard(mockBook({ isbn: null }))
     expect(screen.queryByRole('img')).not.toBeInTheDocument()
-    expect(screen.getByText('📖')).toBeInTheDocument()
   })
 
   it('wyświetla obrazek okładki gdy jest ISBN', () => {
@@ -77,6 +76,6 @@ describe('BookCard', () => {
 
   it('wyświetla badge statusu czytania', () => {
     renderCard(mockBook({ user_status: 'reading' }))
-    expect(screen.getByText(/Czytam/)).toBeInTheDocument()
+    expect(screen.getByText(/CZYTAM/)).toBeInTheDocument()
   })
 })

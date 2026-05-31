@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import * as authApi from '../api/auth'
 import { useAuth } from '../hooks/useAuth'
+import { IconBooks } from '@tabler/icons-react'
 
 type View = 'login' | 'register' | 'forgot' | 'reset'
 type ApiError = { message?: string; errors?: Record<string, string[]> }
@@ -88,14 +89,17 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-md">
-        <h1 className="mb-6 text-center text-2xl font-bold text-gray-900">📚 BookTracker</h1>
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12 transition-colors duration-300 dark:bg-slate-900">
+      <div className="w-full max-w-sm rounded-3xl border border-slate-200 bg-white p-8 shadow-soft-lg transition-colors duration-300 dark:border-slate-800 dark:bg-slate-850">
+        <div className="mb-8 flex items-center justify-center gap-2 text-indigo-600 dark:text-indigo-400">
+          <IconBooks size={36} stroke={2} />
+          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">BookTracker</h1>
+        </div>
 
         {/* Forgot password view */}
         {view === 'forgot' && (
           <>
-            <h2 className="mb-4 text-center text-lg font-semibold text-gray-800">
+            <h2 className="mb-5 text-center text-lg font-bold text-slate-800 dark:text-slate-200">
               Resetuj hasło
             </h2>
             <form onSubmit={handleForgot} className="space-y-4" noValidate>
@@ -109,17 +113,17 @@ export function LoginPage() {
                   placeholder="jan@example.com"
                 />
               </Field>
-              {error && <p className="text-sm text-red-600">{error}</p>}
-              {success && <p className="text-sm text-green-600">{success}</p>}
+              {error && <p className="text-sm font-medium text-red-500">{error}</p>}
+              {success && <p className="text-sm font-medium text-emerald-500">{success}</p>}
               <button type="submit" disabled={isSubmitting} className={btn}>
-                {isSubmitting ? '…' : 'Wyślij link resetujący'}
+                {isSubmitting ? 'Wysyłanie…' : 'Wyślij link resetujący'}
               </button>
             </form>
-            <p className="mt-4 text-center text-sm text-gray-500">
+            <p className="mt-6 text-center text-sm">
               <button
                 type="button"
                 onClick={() => { clearErrors(); setView('login') }}
-                className="text-indigo-600 hover:underline"
+                className="font-bold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
               >
                 Wróć do logowania
               </button>
@@ -130,7 +134,7 @@ export function LoginPage() {
         {/* Reset password view */}
         {view === 'reset' && (
           <>
-            <h2 className="mb-4 text-center text-lg font-semibold text-gray-800">
+            <h2 className="mb-5 text-center text-lg font-bold text-slate-800 dark:text-slate-200">
               Nowe hasło
             </h2>
             <form onSubmit={handleReset} className="space-y-4" noValidate>
@@ -144,10 +148,10 @@ export function LoginPage() {
                   className={inp(!!fieldErrors['password'])}
                 />
               </Field>
-              {error && <p className="text-sm text-red-600">{error}</p>}
-              {success && <p className="text-sm text-green-600">{success}</p>}
+              {error && <p className="text-sm font-medium text-red-500">{error}</p>}
+              {success && <p className="text-sm font-medium text-emerald-500">{success}</p>}
               <button type="submit" disabled={isSubmitting} className={btn}>
-                {isSubmitting ? '…' : 'Ustaw nowe hasło'}
+                {isSubmitting ? 'Zapisywanie…' : 'Ustaw nowe hasło'}
               </button>
             </form>
           </>
@@ -156,17 +160,17 @@ export function LoginPage() {
         {/* Login / Register view */}
         {(view === 'login' || view === 'register') && (
           <>
-            <div className="mb-6 flex rounded-lg bg-gray-100 p-1">
+            <div className="mb-6 flex rounded-xl bg-slate-100 p-1 dark:bg-slate-900">
               {(['login', 'register'] as const).map((t) => (
                 <button
                   key={t}
                   type="button"
                   onClick={() => { clearErrors(); setView(t) }}
                   className={[
-                    'flex-1 rounded-md py-1.5 text-sm font-medium transition-colors',
+                    'flex-1 rounded-lg py-2 text-sm font-bold transition-all',
                     view === t
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700',
+                      ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-800 dark:text-slate-100'
+                      : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300',
                   ].join(' ')}
                 >
                   {t === 'login' ? 'Zaloguj się' : 'Zarejestruj się'}
@@ -207,18 +211,18 @@ export function LoginPage() {
                   placeholder={view === 'register' ? 'min. 8 znaków' : ''}
                 />
               </Field>
-              {error && <p className="text-center text-sm text-red-600">{error}</p>}
+              {error && <p className="text-center text-sm font-medium text-red-500">{error}</p>}
               <button type="submit" disabled={isSubmitting} className={btn}>
-                {isSubmitting ? '…' : view === 'login' ? 'Zaloguj się' : 'Utwórz konto'}
+                {isSubmitting ? 'Ładowanie…' : view === 'login' ? 'Zaloguj się' : 'Utwórz konto'}
               </button>
             </form>
 
             {view === 'login' && (
-              <p className="mt-4 text-center text-sm text-gray-500">
+              <p className="mt-6 text-center text-sm">
                 <button
                   type="button"
                   onClick={() => { clearErrors(); setView('forgot') }}
-                  className="text-indigo-600 hover:underline"
+                  className="font-bold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
                 >
                   Nie pamiętasz hasła?
                 </button>
@@ -234,21 +238,21 @@ export function LoginPage() {
 function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="mb-1 block text-sm font-medium text-gray-700">{label}</label>
+      <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400">{label}</label>
       {children}
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+      {error && <p className="mt-1.5 pl-1 text-xs font-medium text-red-500">{error}</p>}
     </div>
   )
 }
 
 function inp(hasError: boolean) {
   return [
-    'w-full rounded-lg border px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1',
+    'w-full rounded-xl border bg-slate-50/50 px-4 py-2.5 text-sm font-medium shadow-sm transition-colors focus:outline-none focus:ring-2 dark:bg-slate-900/50 dark:text-slate-200 dark:placeholder-slate-500',
     hasError
-      ? 'border-red-400 focus:border-red-500 focus:ring-red-500'
-      : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500',
+      ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
+      : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 dark:border-slate-700',
   ].join(' ')
 }
 
 const btn =
-  'w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50'
+  'mt-2 w-full rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-indigo-700 hover:-translate-y-0.5 hover:shadow-soft focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 dark:focus:ring-offset-slate-850'

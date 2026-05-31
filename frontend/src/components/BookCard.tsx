@@ -3,11 +3,15 @@ import { useDeleteRating, useUpsertRating } from '../hooks/useRating'
 import type { Book, ReadingStatus } from '../types/book'
 import { StarRating } from './StarRating'
 import { ImageWithFallback } from './ImageWithFallback'
+import { IconBookmark, IconBook2, IconCheck, IconBook } from '@tabler/icons-react'
 
-const STATUS_ICONS: Record<ReadingStatus, string> = {
-  want_to_read: '🔖',
-  reading: '📖',
-  read: '✅',
+const StatusIcon = ({ status, size = 14 }: { status: ReadingStatus; size?: number }) => {
+  switch (status) {
+    case 'want_to_read': return <IconBookmark size={size} stroke={2.5} />
+    case 'reading': return <IconBook2 size={size} stroke={2.5} />
+    case 'read': return <IconCheck size={size} stroke={2.5} />
+    default: return null
+  }
 }
 
 interface Props {
@@ -31,7 +35,7 @@ export function BookCard({ book, onOpen }: Props) {
 
   return (
     <div
-      className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-200 bg-white px-3 py-3 shadow-sm transition-shadow hover:shadow-md"
+      className="flex cursor-pointer items-start gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-soft dark:border-slate-800 dark:bg-slate-850"
       onClick={() => onOpen(book)}
       role="button"
       tabIndex={0}
@@ -41,38 +45,39 @@ export function BookCard({ book, onOpen }: Props) {
       <ImageWithFallback
         src={coverUrl || undefined}
         alt=""
-        className="h-16 w-10 flex-shrink-0 rounded object-cover shadow-sm"
+        className="h-20 w-14 flex-shrink-0 rounded-lg object-cover shadow-sm dark:opacity-90"
         fallback={
-          <div className="flex h-16 w-10 flex-shrink-0 items-center justify-center rounded bg-indigo-50 text-xl">
-            📖
+          <div className="flex h-20 w-14 flex-shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-300 dark:bg-slate-800 dark:text-slate-600">
+            <IconBook size={24} stroke={1.5} />
           </div>
         }
       />
 
       {/* Content */}
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-gray-900">{book.title}</p>
-        <p className="truncate text-xs text-gray-500">{book.author}</p>
+        <p className="truncate text-base font-bold text-slate-900 dark:text-slate-100">{book.title}</p>
+        <p className="truncate text-xs font-medium text-slate-500 dark:text-slate-400">{book.author}</p>
 
         {/* Ratings row */}
-        <div className="mt-1 flex flex-wrap items-center gap-2">
+        <div className="mt-2 flex flex-wrap items-center gap-2">
           <StarRating value={book.avg_rating} count={book.ratings_count} readonly />
-          <span className="text-gray-300">·</span>
+          <span className="text-slate-300 dark:text-slate-700">·</span>
           <span onClick={(e) => e.stopPropagation()}>
             <StarRating value={book.user_rating} onRate={handleRate} />
           </span>
         </div>
 
         {/* Badges */}
-        <div className="mt-1 flex flex-wrap items-center gap-1.5">
+        <div className="mt-2.5 flex flex-wrap items-center gap-2">
           {book.genre && (
-            <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs text-indigo-600">
-              {book.genre}
+            <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-[11px] font-bold tracking-wide text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400">
+              {book.genre.toUpperCase()}
             </span>
           )}
           {book.user_status && (
-            <span className="rounded-full bg-green-50 px-2 py-0.5 text-xs text-green-700">
-              {STATUS_ICONS[book.user_status]} {book.user_status === 'want_to_read' ? 'Chcę przeczytać' : book.user_status === 'reading' ? 'Czytam' : 'Przeczytane'}
+            <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-bold tracking-wide text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
+              <StatusIcon status={book.user_status} />
+              {book.user_status === 'want_to_read' ? 'CHCĘ PRZECZYTAĆ' : book.user_status === 'reading' ? 'CZYTAM' : 'PRZECZYTANE'}
             </span>
           )}
         </div>

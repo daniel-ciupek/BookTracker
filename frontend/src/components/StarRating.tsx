@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { IconStarFilled } from '@tabler/icons-react'
 
 interface Props {
   value: number | null
@@ -15,20 +16,22 @@ export function StarRating({ value, count, readonly = false, onRate }: Props) {
   if (readonly) {
     return (
       <span className="inline-flex items-center gap-1 text-sm">
-        <span className="text-yellow-400">
+        <span className="flex items-center gap-0.5">
           {Array.from({ length: 5 }, (_, i) => (
-            <span key={i} className={i < Math.round(display) ? 'text-yellow-400' : 'text-gray-300'}>
-              ★
-            </span>
+            <IconStarFilled 
+              key={i} 
+              size={16}
+              className={i < Math.round(display) ? 'text-amber-400' : 'text-slate-200 dark:text-slate-700'} 
+            />
           ))}
         </span>
         {value !== null && (
-          <span className="text-gray-500">
+          <span className="text-slate-500 dark:text-slate-400 font-medium ml-1">
             {value.toFixed(1)}
-            {count !== undefined && <span className="ml-1">({count})</span>}
+            {count !== undefined && <span className="ml-1 opacity-70">({count})</span>}
           </span>
         )}
-        {value === null && <span className="text-gray-400 text-xs">Brak ocen</span>}
+        {value === null && <span className="text-slate-400 dark:text-slate-500 text-xs ml-1 font-medium">Brak ocen</span>}
       </span>
     )
   }
@@ -49,12 +52,11 @@ export function StarRating({ value, count, readonly = false, onRate }: Props) {
             onMouseEnter={() => setHovered(star)}
             onClick={() => onRate?.(value === star ? null : star)}
             className={[
-              'text-xl leading-none transition-colors',
-              star <= display ? 'text-yellow-400' : 'text-gray-300',
-              'hover:scale-110',
+              'transition-all hover:scale-110',
+              star <= display ? 'text-amber-400 drop-shadow-sm' : 'text-slate-200 dark:text-slate-700 hover:text-amber-300',
             ].join(' ')}
           >
-            ★
+            <IconStarFilled size={22} />
           </button>
         )
       })}

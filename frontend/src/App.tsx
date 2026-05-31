@@ -6,11 +6,13 @@ import { LoginPage } from './components/LoginPage'
 import { SearchBar } from './components/SearchBar'
 import { SettingsPage } from './components/SettingsPage'
 import { useAuth } from './hooks/useAuth'
+import { GENRES } from './lib/constants'
 import type { Book } from './types/book'
 
 export default function App() {
   const { user, isLoading, logout } = useAuth()
   const [search, setSearch] = useState('')
+  const [genre, setGenre] = useState('')
   const [selectedBook, setSelectedBook] = useState<Book | null>(null)
   const [showSettings, setShowSettings] = useState(false)
 
@@ -53,10 +55,24 @@ export default function App() {
         </aside>
 
         <section>
-          <div className="mb-4">
-            <SearchBar onSearch={setSearch} />
+          <div className="mb-4 flex gap-4">
+            <div className="flex-1">
+              <SearchBar onSearch={setSearch} />
+            </div>
+            <select
+              value={genre}
+              onChange={(e) => setGenre(e.target.value)}
+              className="w-48 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            >
+              <option value="">Wszystkie gatunki</option>
+              {GENRES.map((g) => (
+                <option key={g} value={g}>
+                  {g}
+                </option>
+              ))}
+            </select>
           </div>
-          <BookList search={search} onOpenBook={setSelectedBook} />
+          <BookList search={search} genre={genre || undefined} onOpenBook={setSelectedBook} />
         </section>
       </main>
 

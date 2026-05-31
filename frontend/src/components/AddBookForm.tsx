@@ -3,9 +3,8 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { ValidationError } from '../api/books'
 import { useAddBook } from '../hooks/useBooks'
+import { GENRES } from '../lib/constants'
 import { isValidIsbn } from '../lib/isbn'
-
-const GENRES = ['Fantastyka', 'Kryminał', 'Romans', 'Thriller', 'Historia', 'Biografia', 'Nauka', 'Inne']
 
 const schema = z.object({
   title: z.string().min(1, 'Tytuł jest wymagany').max(255),

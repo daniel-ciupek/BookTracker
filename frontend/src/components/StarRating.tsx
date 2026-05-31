@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { IconStarFilled } from '@tabler/icons-react'
+import { Star } from 'lucide-react'
 
 interface Props {
   value: number | null
@@ -18,17 +18,18 @@ export function StarRating({ value, count, readonly = false, onRate }: Props) {
       <span className="inline-flex items-center gap-1 text-sm">
         <span className="flex items-center gap-0.5">
           {Array.from({ length: 5 }, (_, i) => (
-            <IconStarFilled 
+            <Star 
               key={i} 
               size={16}
-              className={i < Math.round(display) ? 'text-amber-400' : 'text-slate-200 dark:text-slate-700'} 
+              className={i < Math.round(display) ? 'fill-amber-400 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]' : 'fill-slate-200/50 text-slate-300 dark:fill-slate-800 dark:text-slate-700'} 
+              strokeWidth={1.5}
             />
           ))}
         </span>
         {value !== null && (
-          <span className="text-slate-500 dark:text-slate-400 font-medium ml-1">
+          <span className="text-slate-600 dark:text-slate-300 font-bold ml-1 drop-shadow-sm">
             {value.toFixed(1)}
-            {count !== undefined && <span className="ml-1 opacity-70">({count})</span>}
+            {count !== undefined && <span className="ml-1 font-medium opacity-70">({count})</span>}
           </span>
         )}
         {value === null && <span className="text-slate-400 dark:text-slate-500 text-xs ml-1 font-medium">Brak ocen</span>}
@@ -52,11 +53,11 @@ export function StarRating({ value, count, readonly = false, onRate }: Props) {
             onMouseEnter={() => setHovered(star)}
             onClick={() => onRate?.(value === star ? null : star)}
             className={[
-              'transition-all hover:scale-110',
-              star <= display ? 'text-amber-400 drop-shadow-sm' : 'text-slate-200 dark:text-slate-700 hover:text-amber-300',
+              'transition-all duration-300 hover:scale-125 focus:outline-none',
+              star <= display ? 'text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.8)]' : 'text-slate-300 dark:text-slate-600 hover:text-amber-300',
             ].join(' ')}
           >
-            <IconStarFilled size={22} />
+            <Star size={22} className={star <= display ? 'fill-amber-400' : 'fill-transparent'} strokeWidth={1.5} />
           </button>
         )
       })}

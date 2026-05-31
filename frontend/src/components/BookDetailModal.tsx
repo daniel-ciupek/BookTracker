@@ -8,7 +8,7 @@ import { useAuth } from '../hooks/useAuth'
 import { ReviewCard } from './ReviewCard'
 import { StarRating } from './StarRating'
 import { ImageWithFallback } from './ImageWithFallback'
-import { IconX, IconBook } from '@tabler/icons-react'
+import { X, Book as BookIcon } from 'lucide-react'
 
 const STATUS_LABELS: Record<ReadingStatus, string> = {
   want_to_read: 'Chcę przeczytać',
@@ -90,21 +90,21 @@ export function BookDetailModal({ book, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 px-4 py-6 backdrop-blur-sm transition-all"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 px-4 py-6 backdrop-blur-md transition-all"
       onClick={onClose}
     >
       <div
         ref={containerRef}
-        className="relative flex max-h-full w-full max-w-2xl flex-col overflow-hidden rounded-3xl bg-white shadow-soft-lg dark:bg-slate-850 dark:border dark:border-slate-800"
+        className="glass-panel relative flex max-h-full w-full max-w-2xl flex-col overflow-hidden rounded-3xl"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-5 top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
+          className="glass-icon-btn absolute right-5 top-5 z-10"
           aria-label="Zamknij"
         >
-          <IconX size={20} stroke={2.5} />
+          <X size={18} strokeWidth={2.5} />
         </button>
 
         <div className="overflow-y-auto">
@@ -115,44 +115,44 @@ export function BookDetailModal({ book, onClose }: Props) {
               alt={`Okładka: ${book.title}`}
               className="h-40 w-28 flex-shrink-0 rounded-xl object-cover shadow-md dark:opacity-90"
               fallback={
-                <div className="flex h-40 w-28 flex-shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-300 dark:bg-slate-800 dark:text-slate-600 shadow-sm">
-                  <IconBook size={40} stroke={1.5} />
+                <div className="flex h-40 w-28 flex-shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-500 dark:text-slate-400 shadow-inner border border-indigo-200/50 dark:border-slate-700/50">
+                  <BookIcon size={40} strokeWidth={1.5} />
                 </div>
               }
             />
             <div className="min-w-0 flex-1 pt-1">
-              <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">{book.title}</h2>
-              <p className="mt-1 text-base font-medium text-slate-500 dark:text-slate-400">{book.author}</p>
+              <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl drop-shadow-sm">{book.title}</h2>
+              <p className="mt-1 text-base font-medium text-slate-600 dark:text-slate-400">{book.author}</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {book.genre && (
-                  <span className="rounded-full bg-indigo-50 px-3 py-1 text-[11px] font-bold tracking-wide text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400">
+                  <span className="rounded-full bg-indigo-100/80 backdrop-blur-sm border border-indigo-200/50 px-3 py-1 text-[11px] font-bold tracking-wide text-indigo-700 dark:bg-indigo-500/20 dark:border-indigo-400/20 dark:text-indigo-300">
                     {book.genre.toUpperCase()}
                   </span>
                 )}
               </div>
-              <div className="mt-3 text-sm text-slate-400 dark:text-slate-500">
+              <div className="mt-3 text-sm font-medium text-slate-500 dark:text-slate-500">
                 {book.pages && <span className="mr-3">{book.pages} stron</span>}
                 {book.added_by && <span>Dodał: {book.added_by.name}</span>}
               </div>
             </div>
           </div>
 
-          <div className="border-t border-slate-100 px-6 py-6 dark:border-slate-800 sm:px-8">
+          <div className="border-t border-slate-200/50 px-6 py-6 dark:border-slate-700/50 sm:px-8">
             {/* Ratings */}
             <div className="mb-6 flex flex-wrap items-center gap-8">
               <div>
-                <p className="mb-1.5 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">Średnia ocena</p>
+                <p className="mb-1.5 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400 drop-shadow-sm">Średnia ocena</p>
                 <StarRating value={book.avg_rating} count={book.ratings_count} readonly />
               </div>
               <div>
-                <p className="mb-1.5 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">Twoja ocena</p>
+                <p className="mb-1.5 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400 drop-shadow-sm">Twoja ocena</p>
                 <StarRating value={userRating} onRate={handleRate} />
               </div>
             </div>
 
             {/* Status */}
             <div className="mb-8">
-              <p className="mb-2.5 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">Status czytania</p>
+              <p className="mb-2.5 text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400 drop-shadow-sm">Status czytania</p>
               <div className="flex flex-wrap gap-2">
                 {(Object.keys(STATUS_LABELS) as ReadingStatus[]).map((s) => (
                   <button
@@ -160,10 +160,10 @@ export function BookDetailModal({ book, onClose }: Props) {
                     type="button"
                     onClick={() => handleStatus(s)}
                     className={[
-                      'rounded-full px-4 py-1.5 text-sm font-bold transition-colors',
+                      'rounded-full px-4 py-1.5 text-sm font-bold transition-all hover:-translate-y-0.5 border',
                       userStatus === s
-                        ? 'bg-indigo-600 text-white shadow-md'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700',
+                        ? 'bg-indigo-600/90 text-white shadow-[0_0_15px_rgba(79,70,229,0.3)] border-indigo-500'
+                        : 'bg-white/40 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 border-white/50 dark:border-slate-700/50 hover:bg-white/60 dark:hover:bg-slate-700/80',
                     ].join(' ')}
                   >
                     {STATUS_LABELS[s]}
@@ -174,8 +174,8 @@ export function BookDetailModal({ book, onClose }: Props) {
 
             {/* Reviews */}
             <div>
-              <p className="mb-4 text-base font-bold text-slate-800 dark:text-slate-200">
-                Recenzje <span className="text-slate-400 dark:text-slate-500 font-normal">({book.reviews_count})</span>
+              <p className="mb-4 text-base font-bold text-slate-900 dark:text-slate-100 drop-shadow-sm">
+                Recenzje <span className="text-slate-500 dark:text-slate-400 font-medium">({book.reviews_count})</span>
               </p>
 
               {/* Add/Edit review form */}
@@ -186,13 +186,13 @@ export function BookDetailModal({ book, onClose }: Props) {
                     onChange={(e) => setReviewBody(e.target.value)}
                     placeholder="Napisz recenzję…"
                     rows={3}
-                    className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 placeholder-slate-400 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:placeholder-slate-500"
+                    className="glass-input"
                   />
                   {reviewError && <p className="mt-1.5 pl-2 text-xs font-medium text-red-500">{reviewError}</p>}
                   <button
                     type="submit"
                     disabled={upsertReview.isPending}
-                    className="mt-2.5 rounded-xl bg-indigo-600 px-5 py-2 text-sm font-bold text-white shadow-sm transition-all hover:bg-indigo-700 disabled:opacity-50"
+                    className="glass-button mt-2.5 w-max"
                   >
                     {upsertReview.isPending ? 'Zapisywanie…' : 'Dodaj recenzję'}
                   </button>
@@ -205,20 +205,20 @@ export function BookDetailModal({ book, onClose }: Props) {
                     value={editingReview.body}
                     onChange={(e) => setEditingReview({ ...editingReview, body: e.target.value })}
                     rows={3}
-                    className="w-full rounded-2xl border border-indigo-300 bg-white px-4 py-3 text-sm text-slate-700 placeholder-slate-400 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-indigo-500/50 dark:bg-slate-900 dark:text-slate-200"
+                    className="glass-input focus:ring-indigo-500/80 border-indigo-400/50"
                   />
                   <div className="mt-2.5 flex gap-2.5">
                     <button
                       type="submit"
                       disabled={upsertReview.isPending}
-                      className="rounded-xl bg-indigo-600 px-5 py-2 text-sm font-bold text-white shadow-sm transition-all hover:bg-indigo-700 disabled:opacity-50"
+                      className="glass-button"
                     >
                       {upsertReview.isPending ? 'Zapisywanie…' : 'Zapisz zmiany'}
                     </button>
                     <button
                       type="button"
                       onClick={() => setEditingReview(null)}
-                      className="rounded-xl bg-slate-100 px-5 py-2 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                      className="glass-button-secondary"
                     >
                       Anuluj
                     </button>
@@ -229,7 +229,7 @@ export function BookDetailModal({ book, onClose }: Props) {
               {/* Reviews list */}
               <div className="space-y-4">
                 {allReviews.length === 0 && (
-                  <p className="rounded-2xl border border-dashed border-slate-200 p-8 text-center text-sm font-medium text-slate-400 dark:border-slate-800 dark:text-slate-500">
+                  <p className="rounded-2xl border border-dashed border-slate-300 bg-white/30 dark:bg-slate-900/30 dark:border-slate-700 p-8 text-center text-sm font-medium text-slate-500 dark:text-slate-400 backdrop-blur-sm">
                     Brak recenzji. Bądź pierwszy!
                   </p>
                 )}
@@ -249,7 +249,7 @@ export function BookDetailModal({ book, onClose }: Props) {
                   type="button"
                   onClick={() => void fetchNextPage()}
                   disabled={isFetchingNextPage}
-                  className="mt-4 w-full rounded-xl border border-slate-200 py-2.5 text-sm font-bold text-indigo-600 transition-colors hover:bg-indigo-50 dark:border-slate-800 dark:text-indigo-400 dark:hover:bg-slate-800/50 disabled:opacity-50"
+                  className="glass-button-secondary mt-4 w-full"
                 >
                   {isFetchingNextPage ? 'Ładowanie…' : 'Załaduj więcej recenzji'}
                 </button>

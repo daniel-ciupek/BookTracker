@@ -9,7 +9,7 @@ import { useAuth } from './hooks/useAuth'
 import { useTheme } from './components/ThemeProvider'
 import { GENRES } from './lib/constants'
 import type { Book } from './types/book'
-import { IconSun, IconMoon, IconSettings, IconLogout, IconBooks } from '@tabler/icons-react'
+import { Sun, Moon, Settings, LogOut, Library } from 'lucide-react'
 
 export default function App() {
   const { user, isLoading, logout } = useAuth()
@@ -21,8 +21,8 @@ export default function App() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-900">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent shadow-[0_0_15px_rgba(99,102,241,0.5)]" />
       </div>
     )
   }
@@ -30,11 +30,11 @@ export default function App() {
   if (!user) return <LoginPage />
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
-      <header className="border-b border-slate-200 bg-white px-6 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-850 transition-colors duration-300">
+    <div className="min-h-screen transition-colors duration-500">
+      <header className="glass-panel sticky top-0 z-40 mx-4 mt-4 rounded-2xl px-6 py-4">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
-            <IconBooks size={28} stroke={2} />
+          <div className="flex items-center gap-2.5 text-indigo-600 dark:text-indigo-400">
+            <Library size={28} strokeWidth={2.5} className="drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]" />
             <h1 className="text-xl font-extrabold tracking-tight">BookTracker</h1>
           </div>
           <div className="flex items-center gap-3">
@@ -42,27 +42,20 @@ export default function App() {
               {user.email}
             </span>
             
-            {/* Theme Toggle */}
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+              className="glass-icon-btn"
               aria-label="Przełącz motyw"
             >
-              {theme === 'dark' ? <IconSun size={20} stroke={2} /> : <IconMoon size={20} stroke={2} />}
+              {theme === 'dark' ? <Sun size={18} strokeWidth={2.5} /> : <Moon size={18} strokeWidth={2.5} />}
             </button>
 
-            <button
-              onClick={() => setShowSettings(true)}
-              className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-850 dark:text-slate-300 dark:hover:bg-slate-800"
-            >
-              <IconSettings size={18} stroke={2} />
+            <button onClick={() => setShowSettings(true)} className="glass-button-secondary">
+              <Settings size={16} strokeWidth={2.5} />
               <span className="hidden sm:inline">Ustawienia</span>
             </button>
-            <button
-              onClick={() => void logout()}
-              className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-850 dark:text-slate-300 dark:hover:bg-slate-800"
-            >
-              <IconLogout size={18} stroke={2} />
+            <button onClick={() => void logout()} className="glass-button-secondary text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300">
+              <LogOut size={16} strokeWidth={2.5} />
               <span className="hidden sm:inline">Wyloguj</span>
             </button>
           </div>
@@ -70,7 +63,7 @@ export default function App() {
       </header>
 
       <main className="mx-auto max-w-6xl gap-8 p-6 md:grid md:grid-cols-[380px_1fr]">
-        <aside className="h-fit rounded-3xl border border-slate-200 bg-white p-6 shadow-soft dark:border-slate-800 dark:bg-slate-850 transition-colors duration-300">
+        <aside className="glass-panel h-fit rounded-3xl p-6">
           <AddBookForm />
         </aside>
 
@@ -82,13 +75,11 @@ export default function App() {
             <select
               value={genre}
               onChange={(e) => setGenre(e.target.value)}
-              className="w-48 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-850 dark:text-slate-200"
+              className="glass-input w-48 appearance-none"
             >
               <option value="">Wszystkie gatunki</option>
               {GENRES.map((g) => (
-                <option key={g} value={g}>
-                  {g}
-                </option>
+                <option key={g} value={g}>{g}</option>
               ))}
             </select>
           </div>

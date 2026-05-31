@@ -5,7 +5,7 @@ import { ValidationError } from '../api/books'
 import { useAddBook } from '../hooks/useBooks'
 import { GENRES } from '../lib/constants'
 import { isValidIsbn } from '../lib/isbn'
-import { IconPlus } from '@tabler/icons-react'
+import { Plus } from 'lucide-react'
 
 const schema = z.object({
   title: z.string().min(1, 'Tytuł jest wymagany').max(255),
@@ -56,7 +56,7 @@ export function AddBookForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
-      <h2 className="mb-2 text-lg font-extrabold tracking-tight text-slate-800 dark:text-slate-100">Dodaj książkę</h2>
+      <h2 className="mb-2 text-lg font-extrabold tracking-tight text-slate-800 dark:text-slate-100 drop-shadow-sm">Dodaj książkę</h2>
 
       <Field label="Tytuł *" error={errors.title?.message}>
         <input
@@ -109,13 +109,13 @@ export function AddBookForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-indigo-700 hover:shadow-soft focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 dark:focus:ring-offset-slate-850"
+        className="glass-button w-full mt-2"
       >
         {isSubmitting ? (
           'Dodawanie…'
         ) : (
           <>
-            <IconPlus size={18} stroke={2.5} />
+            <Plus size={18} strokeWidth={2.5} />
             Dodaj książkę
           </>
         )}
@@ -135,7 +135,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400">{label}</label>
+      <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400 drop-shadow-sm">{label}</label>
       {children}
       {error && <p className="mt-1.5 pl-1 text-xs font-medium text-red-500">{error}</p>}
     </div>
@@ -144,9 +144,9 @@ function Field({
 
 function input(hasError: boolean) {
   return [
-    'w-full rounded-xl border bg-slate-50/50 px-4 py-2.5 text-sm font-medium shadow-sm transition-colors focus:outline-none focus:ring-2 dark:bg-slate-900/50 dark:text-slate-200 dark:placeholder-slate-500',
+    'glass-input',
     hasError
       ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
-      : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 dark:border-slate-700',
+      : '',
   ].join(' ')
 }

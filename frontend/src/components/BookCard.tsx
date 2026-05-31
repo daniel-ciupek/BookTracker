@@ -3,13 +3,13 @@ import { useDeleteRating, useUpsertRating } from '../hooks/useRating'
 import type { Book, ReadingStatus } from '../types/book'
 import { StarRating } from './StarRating'
 import { ImageWithFallback } from './ImageWithFallback'
-import { IconBookmark, IconBook2, IconCheck, IconBook } from '@tabler/icons-react'
+import { Bookmark, BookOpen, CheckCircle, Book as BookIcon } from 'lucide-react'
 
 const StatusIcon = ({ status, size = 14 }: { status: ReadingStatus; size?: number }) => {
   switch (status) {
-    case 'want_to_read': return <IconBookmark size={size} stroke={2.5} />
-    case 'reading': return <IconBook2 size={size} stroke={2.5} />
-    case 'read': return <IconCheck size={size} stroke={2.5} />
+    case 'want_to_read': return <Bookmark size={size} strokeWidth={2.5} />
+    case 'reading': return <BookOpen size={size} strokeWidth={2.5} />
+    case 'read': return <CheckCircle size={size} strokeWidth={2.5} />
     default: return null
   }
 }
@@ -35,7 +35,7 @@ export function BookCard({ book, onOpen }: Props) {
 
   return (
     <div
-      className="flex cursor-pointer items-start gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-soft dark:border-slate-800 dark:bg-slate-850"
+      className="glass-panel flex cursor-pointer items-start gap-4 rounded-2xl p-4 transition-all hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(99,102,241,0.2)] dark:hover:shadow-[0_0_20px_rgba(99,102,241,0.3)]"
       onClick={() => onOpen(book)}
       role="button"
       tabIndex={0}
@@ -45,37 +45,37 @@ export function BookCard({ book, onOpen }: Props) {
       <ImageWithFallback
         src={coverUrl || undefined}
         alt=""
-        className="h-20 w-14 flex-shrink-0 rounded-lg object-cover shadow-sm dark:opacity-90"
+        className="h-24 w-16 flex-shrink-0 rounded-lg object-cover shadow-md dark:opacity-90"
         fallback={
-          <div className="flex h-20 w-14 flex-shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-300 dark:bg-slate-800 dark:text-slate-600">
-            <IconBook size={24} stroke={1.5} />
+          <div className="flex h-24 w-16 flex-shrink-0 items-center justify-center rounded-lg bg-indigo-50/50 backdrop-blur-sm text-indigo-400 dark:bg-slate-800/50 dark:text-slate-500 shadow-inner border border-white/20 dark:border-white/5">
+            <BookIcon size={28} strokeWidth={1.5} />
           </div>
         }
       />
 
       {/* Content */}
       <div className="min-w-0 flex-1">
-        <p className="truncate text-base font-bold text-slate-900 dark:text-slate-100">{book.title}</p>
-        <p className="truncate text-xs font-medium text-slate-500 dark:text-slate-400">{book.author}</p>
+        <p className="truncate text-base font-extrabold text-slate-900 dark:text-slate-100 drop-shadow-sm">{book.title}</p>
+        <p className="truncate text-xs font-semibold text-slate-500 dark:text-slate-400">{book.author}</p>
 
         {/* Ratings row */}
-        <div className="mt-2 flex flex-wrap items-center gap-2">
+        <div className="mt-2.5 flex flex-wrap items-center gap-2">
           <StarRating value={book.avg_rating} count={book.ratings_count} readonly />
-          <span className="text-slate-300 dark:text-slate-700">·</span>
+          <span className="text-slate-300 dark:text-slate-600">·</span>
           <span onClick={(e) => e.stopPropagation()}>
             <StarRating value={book.user_rating} onRate={handleRate} />
           </span>
         </div>
 
         {/* Badges */}
-        <div className="mt-2.5 flex flex-wrap items-center gap-2">
+        <div className="mt-3 flex flex-wrap items-center gap-2">
           {book.genre && (
-            <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-[11px] font-bold tracking-wide text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400">
+            <span className="rounded-full bg-indigo-100/80 backdrop-blur-sm border border-indigo-200/50 px-2.5 py-0.5 text-[11px] font-bold tracking-wide text-indigo-700 dark:bg-indigo-500/20 dark:border-indigo-400/20 dark:text-indigo-300">
               {book.genre.toUpperCase()}
             </span>
           )}
           {book.user_status && (
-            <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-bold tracking-wide text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
+            <span className="flex items-center gap-1 rounded-full bg-emerald-100/80 backdrop-blur-sm border border-emerald-200/50 px-2.5 py-0.5 text-[11px] font-bold tracking-wide text-emerald-700 dark:bg-emerald-500/20 dark:border-emerald-400/20 dark:text-emerald-300">
               <StatusIcon status={book.user_status} />
               {book.user_status === 'want_to_read' ? 'CHCĘ PRZECZYTAĆ' : book.user_status === 'reading' ? 'CZYTAM' : 'PRZECZYTANE'}
             </span>

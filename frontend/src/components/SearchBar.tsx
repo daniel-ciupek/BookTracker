@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { IconSearch } from '@tabler/icons-react'
+import { Search } from 'lucide-react'
 
 interface Props {
   onSearch: (value: string) => void
@@ -31,17 +31,17 @@ export function SearchBar({ onSearch }: Props) {
   return (
     <div className="relative">
       <div className="relative flex items-center">
-        <IconSearch 
+        <Search 
           size={18} 
           className="absolute left-4 text-slate-400 dark:text-slate-500" 
-          stroke={2.5} 
+          strokeWidth={2.5} 
         />
         <input
           type="search"
           placeholder="Szukaj po tytule lub autorze…"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          className="w-full rounded-xl border border-slate-200 bg-white pl-11 pr-4 py-2.5 text-sm font-medium text-slate-700 placeholder-slate-400 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-850 dark:text-slate-200 dark:placeholder-slate-500 dark:focus:border-indigo-500"
+          className="glass-input pl-11"
         />
       </div>
       {showHint && (

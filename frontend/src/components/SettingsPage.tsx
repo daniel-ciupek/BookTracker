@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
-import { IconX } from '@tabler/icons-react'
+import { X } from 'lucide-react'
 
 type ApiError = { message?: string; errors?: Record<string, string[]> }
 
@@ -77,47 +77,47 @@ export function SettingsPage({ onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 px-4 py-6 backdrop-blur-sm transition-all"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 py-6 backdrop-blur-md transition-all"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-md overflow-y-auto rounded-3xl bg-white p-8 shadow-soft-lg dark:border dark:border-slate-800 dark:bg-slate-850"
+        className="glass-panel relative w-full max-w-md overflow-y-auto rounded-3xl p-8"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
+          className="glass-icon-btn absolute right-5 top-5"
           aria-label="Zamknij"
         >
-          <IconX size={20} stroke={2.5} />
+          <X size={18} strokeWidth={2.5} />
         </button>
 
-        <h2 className="mb-8 text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">Ustawienia</h2>
+        <h2 className="mb-8 text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 drop-shadow-sm">Ustawienia</h2>
 
         {/* Profile section */}
         <section className="mb-8">
           <h3 className="mb-4 text-base font-bold text-slate-800 dark:text-slate-200">Twój profil</h3>
           <form onSubmit={handleProfileSubmit} className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400">Imię</label>
+              <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400 drop-shadow-sm">Imię</label>
               <input
                 type="text"
                 value={profileName}
                 onChange={(e) => setProfileName(e.target.value)}
-                className={inp(!!profileErrors['name'])}
+                className="glass-input"
               />
               {profileErrors['name'] && (
                 <p className="mt-1.5 pl-1 text-xs font-medium text-red-500">{profileErrors['name']}</p>
               )}
             </div>
             <div>
-              <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400">E-mail</label>
+              <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400 drop-shadow-sm">E-mail</label>
               <input
                 type="email"
                 value={profileEmail}
                 onChange={(e) => setProfileEmail(e.target.value)}
-                className={inp(!!profileErrors['email'])}
+                className="glass-input"
               />
               {profileErrors['email'] && (
                 <p className="mt-1.5 pl-1 text-xs font-medium text-red-500">{profileErrors['email']}</p>
@@ -130,55 +130,55 @@ export function SettingsPage({ onClose }: Props) {
             <button
               type="submit"
               disabled={profileLoading}
-              className="mt-2 w-full rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-indigo-700 hover:shadow-soft disabled:opacity-50"
+              className="glass-button w-full mt-2"
             >
               {profileLoading ? 'Zapisywanie…' : 'Zapisz profil'}
             </button>
           </form>
         </section>
 
-        <hr className="mb-8 border-slate-100 dark:border-slate-800" />
+        <hr className="mb-8 border-slate-200/50 dark:border-slate-700/50" />
 
         {/* Password section */}
         <section>
           <h3 className="mb-4 text-base font-bold text-slate-800 dark:text-slate-200">Zmień hasło</h3>
           <form onSubmit={handlePasswordSubmit} className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400">
+              <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400 drop-shadow-sm">
                 Obecne hasło
               </label>
               <input
                 type="password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                className={inp(!!passwordErrors['current_password'])}
+                className="glass-input"
               />
               {passwordErrors['current_password'] && (
                 <p className="mt-1.5 pl-1 text-xs font-medium text-red-500">{passwordErrors['current_password']}</p>
               )}
             </div>
             <div>
-              <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400">Nowe hasło</label>
+              <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400 drop-shadow-sm">Nowe hasło</label>
               <input
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="min. 8 znaków"
-                className={inp(!!passwordErrors['password'])}
+                className="glass-input"
               />
               {passwordErrors['password'] && (
                 <p className="mt-1.5 pl-1 text-xs font-medium text-red-500">{passwordErrors['password']}</p>
               )}
             </div>
             <div>
-              <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400">
+              <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400 drop-shadow-sm">
                 Powtórz nowe hasło
               </label>
               <input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className={inp(!!passwordErrors['confirm'])}
+                className="glass-input"
               />
               {passwordErrors['confirm'] && (
                 <p className="mt-1.5 pl-1 text-xs font-medium text-red-500">{passwordErrors['confirm']}</p>
@@ -191,7 +191,7 @@ export function SettingsPage({ onClose }: Props) {
             <button
               type="submit"
               disabled={passwordLoading}
-              className="mt-2 w-full rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-slate-800 hover:shadow-soft disabled:opacity-50 dark:bg-slate-700 dark:hover:bg-slate-600"
+              className="glass-button w-full mt-2"
             >
               {passwordLoading ? 'Zmienianie…' : 'Zmień hasło'}
             </button>
@@ -200,13 +200,4 @@ export function SettingsPage({ onClose }: Props) {
       </div>
     </div>
   )
-}
-
-function inp(hasError: boolean) {
-  return [
-    'w-full rounded-xl border bg-slate-50/50 px-4 py-2.5 text-sm font-medium shadow-sm transition-colors focus:outline-none focus:ring-2 dark:bg-slate-900/50 dark:text-slate-200 dark:placeholder-slate-500',
-    hasError
-      ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
-      : 'border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20 dark:border-slate-700',
-  ].join(' ')
 }

@@ -8,6 +8,7 @@ import { SettingsPage } from './components/SettingsPage'
 import { useAuth } from './hooks/useAuth'
 import { useTheme } from './components/ThemeProvider'
 import { GENRES } from './lib/constants'
+import { getInitials } from './lib/initials'
 import type { Book } from './types/book'
 import { Sun, Moon, Settings, LogOut, BookOpen, ChevronDown, LayoutGrid } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -22,14 +23,7 @@ export default function App() {
   const [selectedBook, setSelectedBook] = useState<Book | null>(null)
   const [showSettings, setShowSettings] = useState(false)
 
-  const initials = user?.name
-    ? user.name
-        .split(' ')
-        .map((w) => w[0])
-        .join('')
-        .slice(0, 2)
-        .toUpperCase()
-    : '?'
+  const initials = getInitials(user?.name ?? '')
 
   if (isLoading) {
     return (
@@ -134,9 +128,10 @@ export default function App() {
               whileTap={{ scale: 0.95 }}
               onClick={() => setShowSettings(true)}
               className="glass-button-secondary px-2 sm:px-3 h-8"
+              aria-label="Ustawienia"
             >
               <Settings size={15} strokeWidth={2.5} />
-              <span className="hidden md:inline text-xs">Ustawienia</span>
+              <span className="hidden md:inline text-xs" aria-hidden="true">Ustawienia</span>
             </motion.button>
 
             <motion.button
@@ -145,9 +140,10 @@ export default function App() {
               onClick={() => void logout()}
               className="glass-button-secondary px-2 sm:px-3 h-8"
               style={{ color: 'rgba(248,113,113,0.85)' }}
+              aria-label="Wyloguj"
             >
               <LogOut size={15} strokeWidth={2.5} />
-              <span className="hidden md:inline text-xs">Wyloguj</span>
+              <span className="hidden md:inline text-xs" aria-hidden="true">Wyloguj</span>
             </motion.button>
           </div>
         </div>

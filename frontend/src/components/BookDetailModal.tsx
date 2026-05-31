@@ -10,6 +10,7 @@ import { StarRating } from './StarRating'
 import { ImageWithFallback } from './ImageWithFallback'
 import { X, Check, BookOpen } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { getInitials } from '../lib/initials'
 
 const STATUS_LABELS: Record<ReadingStatus, string> = {
   want_to_read: 'Chcę przeczytać',
@@ -28,8 +29,6 @@ interface Props {
   onClose: () => void
 }
 
-const titleInitials = (title: string) =>
-  title.split(' ').slice(0, 2).map((w) => w[0]).join('').toUpperCase()
 
 export function BookDetailModal({ book, onClose }: Props) {
   const { user } = useAuth()
@@ -40,6 +39,7 @@ export function BookDetailModal({ book, onClose }: Props) {
   const [reviewBody, setReviewBody] = useState('')
   const [editingReview, setEditingReview] = useState<Review | null>(null)
   const [reviewError, setReviewError] = useState('')
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const { data: reviewsData, fetchNextPage, hasNextPage, isFetchingNextPage } = useReviews(book.id)
   const allReviews = reviewsData?.pages.flatMap((p) => p.data) ?? []
@@ -135,7 +135,7 @@ export function BookDetailModal({ book, onClose }: Props) {
                     text-purple-600 dark:text-purple-300
                     border border-purple-200 dark:border-purple-800/40"
                 >
-                  {titleInitials(book.title)}
+                  {getInitials(book.title)}
                 </div>
               }
             />
@@ -268,6 +268,10 @@ export function BookDetailModal({ book, onClose }: Props) {
               </form>
             )}
 
+            {deleteError && (
+              <p className="mb-3 text-xs font-medium text-red-500 dark:text-red-400">{deleteError}</p>
+            )}
+
             <div className="space-y-3">
               {allReviews.length === 0 && (
                 <div className="glass-card p-8 text-center border-dashed">
@@ -281,7 +285,14 @@ export function BookDetailModal({ book, onClose }: Props) {
                   review={review}
                   currentUserId={user?.id}
                   onEdit={(r) => setEditingReview(r)}
-                  onDelete={() => void deleteReview.mutateAsync()}
+                  onDelete={async () => {
+                    setDeleteError(null)
+                    try {
+                      await deleteReview.mutateAsync()
+                    } catch {
+                      setDeleteError('Nie udało się usunąć recenzji. Spróbuj ponownie.')
+                    }
+                  }}
                 />
               ))}
             </div>

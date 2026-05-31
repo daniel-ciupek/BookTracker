@@ -177,6 +177,6 @@ function Field({
 function inputClass(hasError: boolean) {
   return [
     'aurora-input',
-    hasError ? 'border-red-500/60 focus:border-red-500 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.12)]' : '',
+    hasError ? 'border-red-500/70 focus:border-red-500 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.25)]' : '',
   ].join(' ')
 }

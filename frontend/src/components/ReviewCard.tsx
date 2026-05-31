@@ -1,6 +1,7 @@
 import type { Review } from '../types/review'
 import { Edit2, Trash2 } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { getInitials } from '../lib/initials'
 
 interface Props {
   review: Review
@@ -10,12 +11,7 @@ interface Props {
 }
 
 export function ReviewCard({ review, currentUserId, onEdit, onDelete }: Props) {
-  const initials = review.user.name
-    .split(' ')
-    .map((w) => w[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase()
+  const initials = getInitials(review.user.name)
 
   const date = new Date(review.created_at).toLocaleDateString('pl-PL', {
     year: 'numeric', month: 'short', day: 'numeric',

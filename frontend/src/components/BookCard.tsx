@@ -6,6 +6,7 @@ import { StarRating } from './StarRating'
 import { ImageWithFallback } from './ImageWithFallback'
 import { Bookmark, BookOpen, CheckCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { getInitials } from '../lib/initials'
 
 const STATUS_CONFIG: Record<ReadingStatus, { label: string; color: string }> = {
   want_to_read: { label: 'Chcę przeczytać', color: 'rgba(56,189,248,0.8)' },
@@ -33,13 +34,6 @@ interface Props {
   onOpen: (book: Book) => void
 }
 
-const titleInitials = (title: string) =>
-  title
-    .split(' ')
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join('')
-    .toUpperCase()
 
 export function BookCard({ book, onOpen }: Props) {
   const upsertRating = useUpsertRating(book.id)
@@ -52,6 +46,7 @@ export function BookCard({ book, onOpen }: Props) {
   const coverUrl = book.isbn ? `https://covers.openlibrary.org/b/isbn/${book.isbn}-M.jpg` : null
 
   function handleRate(v: number | null) {
+    if (upsertRating.isPending || deleteRating.isPending) return
     if (v === null) {
       deleteRating.mutate()
     } else {
@@ -104,7 +99,7 @@ export function BookCard({ book, onOpen }: Props) {
             bg-purple-100 dark:bg-purple-950/40
             text-purple-600 dark:text-purple-300
             border border-purple-200 dark:border-purple-800/40">
-            {titleInitials(book.title)}
+            {getInitials(book.title)}
           </div>
         }
       />

@@ -32,10 +32,11 @@ class BookController extends Controller
         $cursor = $request->query('cursor');
         $search = $request->query('search', '');
         $genre = $request->query('genre', '');
+        $onlyMine = $request->boolean('only_mine');
 
-        $cacheKey = 'books:'.$user->id.':'.md5(serialize([$cursor, $limit, $search, $genre]));
+        $cacheKey = 'books:'.$user->id.':'.md5(serialize([$cursor, $limit, $search, $genre, $onlyMine]));
 
-        $result = Cache::remember($cacheKey, 60, function () use ($user, $cursor, $limit, $search, $genre) {
+        $result = Cache::remember($cacheKey, 60, function () use ($user, $cursor, $limit, $search, $genre, $onlyMine) {
             $uid = $user->id;
 
             $query = Book::query()
@@ -68,6 +69,10 @@ class BookController extends Controller
 
             if ($genre !== '') {
                 $query->where('books.genre', $genre);
+            }
+
+            if ($onlyMine) {
+                $query->where('books.added_by_user_id', $uid);
             }
 
             $books = $query->limit($limit + 1)->get();

@@ -7,12 +7,13 @@ import { BookCard } from './BookCard'
 interface Props {
   search: string
   genre?: string
+  onlyMine?: boolean
   onOpenBook: (book: Book) => void
 }
 
-export function BookList({ search, genre, onOpenBook }: Props) {
+export function BookList({ search, genre, onlyMine, onOpenBook }: Props) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } =
-    useBooks(search, genre)
+    useBooks(search, genre, onlyMine)
 
   const allBooks = data?.pages.flatMap((p) => p.data) ?? []
 

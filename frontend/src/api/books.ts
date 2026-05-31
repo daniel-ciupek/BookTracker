@@ -46,12 +46,14 @@ export function fetchBooks(params: {
   limit?: number
   search?: string
   genre?: string
+  onlyMine?: boolean
 }): Promise<BooksResponse> {
   const q = new URLSearchParams()
   if (params.cursor) q.set('cursor', String(params.cursor))
   if (params.limit) q.set('limit', String(params.limit))
   if (params.search) q.set('search', params.search)
   if (params.genre) q.set('genre', params.genre)
+  if (params.onlyMine) q.set('only_mine', '1')
   const qs = q.toString() ? `?${q}` : ''
   return request<BooksResponse>(`/api/books${qs}`)
 }

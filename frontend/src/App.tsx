@@ -9,14 +9,15 @@ import { useAuth } from './hooks/useAuth'
 import { useTheme } from './components/ThemeProvider'
 import { GENRES } from './lib/constants'
 import type { Book } from './types/book'
-import { Sun, Moon, Settings, LogOut, Library } from 'lucide-react'
-import { AnimatePresence } from 'framer-motion'
+import { Sun, Moon, Settings, LogOut, Library, Layout } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
 
 export default function App() {
   const { user, isLoading, logout } = useAuth()
   const { theme, setTheme } = useTheme()
   const [search, setSearch] = useState('')
   const [genre, setGenre] = useState('')
+  const [onlyMine, setOnlyMine] = useState(false)
   const [selectedBook, setSelectedBook] = useState<Book | null>(null)
   const [showSettings, setShowSettings] = useState(false)
 
@@ -43,22 +44,48 @@ export default function App() {
               {user.name}
             </span>
             
-            <button
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               className="glass-icon-btn"
               aria-label="Przełącz motyw"
             >
               {theme === 'dark' ? <Sun size={18} strokeWidth={2.5} /> : <Moon size={18} strokeWidth={2.5} />}
-            </button>
+            </motion.button>
 
-            <button onClick={() => setShowSettings(true)} className="glass-button-secondary">
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setOnlyMine(!onlyMine)} 
+              className={[
+                "glass-button-secondary",
+                onlyMine ? "bg-indigo-500/20 border-indigo-500/50 text-indigo-600 dark:text-indigo-400" : ""
+              ].join(" ")}
+            >
+              <Layout size={16} strokeWidth={2.5} />
+              <span className="hidden sm:inline">{onlyMine ? 'Wszystkie' : 'Moje publikacje'}</span>
+            </motion.button>
+
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowSettings(true)} 
+              className="glass-button-secondary"
+            >
               <Settings size={16} strokeWidth={2.5} />
               <span className="hidden sm:inline">Ustawienia</span>
-            </button>
-            <button onClick={() => void logout()} className="glass-button-secondary text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300">
+            </motion.button>
+            
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => void logout()} 
+              className="glass-button-secondary text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
+            >
               <LogOut size={16} strokeWidth={2.5} />
               <span className="hidden sm:inline">Wyloguj</span>
-            </button>
+            </motion.button>
           </div>
         </div>
       </header>
@@ -84,7 +111,7 @@ export default function App() {
               ))}
             </select>
           </div>
-          <BookList search={search} genre={genre || undefined} onOpenBook={setSelectedBook} />
+          <BookList search={search} genre={genre || undefined} onlyMine={onlyMine} onOpenBook={setSelectedBook} />
         </section>
       </main>
 
@@ -94,7 +121,9 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {showSettings && <SettingsPage onClose={() => setShowSettings(false)} />}
+      <AnimatePresence>
+        {showSettings && <SettingsPage onClose={() => setShowSettings(false)} />}
+      </AnimatePresence>
     </div>
   )
 }

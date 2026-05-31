@@ -6,6 +6,7 @@ import { useAddBook } from '../hooks/useBooks'
 import { GENRES } from '../lib/constants'
 import { isValidIsbn } from '../lib/isbn'
 import { Plus } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const schema = z.object({
   title: z.string().min(1, 'Tytuł jest wymagany').max(255),
@@ -15,14 +16,19 @@ const schema = z.object({
     .optional()
     .refine((v) => !v || isValidIsbn(v), { message: 'Nieprawidłowy ISBN-10 lub ISBN-13' }),
   pages: z
-    .union([z.coerce.number().int().min(1).max(99999), z.literal('')])
-    .optional()
-    .transform((v) => (v === '' || v === undefined ? undefined : Number(v))),
+    .preprocess(
+      (val) => (val === '' ? undefined : val),
+      z.coerce
+        .number({ invalid_type_error: 'Wprowadź poprawną liczbę' })
+        .int('Liczba musi być całkowita')
+        .min(1, 'Minimum 1 strona')
+        .max(99999, 'Maksimum 99999 stron')
+        .optional()
+    ),
   genre: z.string().optional(),
 })
 
 type FormInput = z.input<typeof schema>
-type FormOutput = z.output<typeof schema>
 
 export function AddBookForm() {
   const {
@@ -35,15 +41,9 @@ export function AddBookForm() {
 
   const mutation = useAddBook()
 
-  async function onSubmit(data: FormOutput) {
+  async function onSubmit(data: FormInput) {
     try {
-      await mutation.mutateAsync({
-        title: data.title,
-        author: data.author,
-        isbn: data.isbn || undefined,
-        pages: data.pages,
-        genre: data.genre || undefined,
-      })
+      await mutation.mutateAsync(data)
       reset()
     } catch (err) {
       if (err instanceof ValidationError) {
@@ -51,6 +51,13 @@ export function AddBookForm() {
           setError(field as keyof FormInput, { message: messages[0] })
         })
       }
+    }
+  }
+
+  // Prevent typing non-numeric characters in number fields
+  const handleNumericKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (['e', 'E', '+', '-', '.'].includes(e.key)) {
+      e.preventDefault()
     }
   }
 
@@ -87,8 +94,8 @@ export function AddBookForm() {
           <input
             {...register('pages')}
             type="number"
-            min={1}
-            max={99999}
+            inputMode="numeric"
+            onKeyDown={handleNumericKeyDown}
             className={input(!!errors.pages)}
             placeholder="np. 400"
           />
@@ -134,11 +141,25 @@ function Field({
   children: React.ReactNode
 }) {
   return (
-    <div>
+    <motion.div
+      animate={error ? { x: [-2, 2, -2, 2, 0] } : {}}
+      transition={{ duration: 0.4 }}
+    >
       <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400 drop-shadow-sm">{label}</label>
       {children}
-      {error && <p className="mt-1.5 pl-1 text-xs font-medium text-red-500">{error}</p>}
-    </div>
+      <AnimatePresence>
+        {error && (
+          <motion.p
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mt-1.5 pl-1 text-xs font-medium text-red-500 overflow-hidden"
+          >
+            {error}
+          </motion.p>
+        )}
+      </AnimatePresence>
+    </motion.div>
   )
 }
 

@@ -37,8 +37,14 @@ export function BookCard({ book, onOpen }: Props) {
     <motion.div
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: 'easeOut' }}
-      className="glass-panel flex cursor-pointer items-start gap-4 rounded-2xl p-4 transition-all hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(99,102,241,0.2)] dark:hover:shadow-[0_0_20px_rgba(99,102,241,0.3)]"
+      whileHover={{ y: -4, scale: 1.01 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ 
+        type: 'spring', 
+        stiffness: 300, 
+        damping: 20 
+      }}
+      className="glass-panel flex cursor-pointer items-start gap-4 rounded-2xl p-4 transition-shadow hover:shadow-[0_20px_40px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)]"
       onClick={() => onOpen(book)}
       role="button"
       tabIndex={0}

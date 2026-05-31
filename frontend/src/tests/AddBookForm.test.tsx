@@ -61,12 +61,12 @@ describe('AddBookForm', () => {
     renderWithQuery(<AddBookForm />)
     await userEvent.type(screen.getByPlaceholderText(/Władca/), 'Clean Code')
     await userEvent.type(screen.getByPlaceholderText(/Tolkien/), 'Robert Martin')
-    await userEvent.selectOptions(screen.getByRole('combobox'), '5')
+    await userEvent.selectOptions(screen.getAllByRole('combobox')[0], 'Nauka')
     await userEvent.click(screen.getByRole('button', { name: /Dodaj/ }))
 
     await waitFor(() => {
       expect(mockMutateAsync).toHaveBeenCalledWith(
-        expect.objectContaining({ title: 'Clean Code', author: 'Robert Martin', rating: 5 })
+        expect.objectContaining({ title: 'Clean Code', author: 'Robert Martin', genre: 'Nauka' })
       )
     })
   })

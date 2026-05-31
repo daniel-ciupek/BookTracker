@@ -1,32 +1,85 @@
-import type { Book } from '../types/book'
+import { useDeleteRating, useUpsertRating } from '../hooks/useRating'
+import type { Book, ReadingStatus } from '../types/book'
+import { StarRating } from './StarRating'
+
+const STATUS_ICONS: Record<ReadingStatus, string> = {
+  want_to_read: '🔖',
+  reading: '📖',
+  read: '✅',
+}
 
 interface Props {
   book: Book
+  onOpen: (book: Book) => void
 }
 
-function Stars({ rating }: { rating: number }) {
-  return (
-    <span aria-label={`Ocena: ${rating} na 5`}>
-      {Array.from({ length: 5 }, (_, i) => (
-        <span key={i} className={i < rating ? 'text-yellow-400' : 'text-gray-300'}>
-          ★
-        </span>
-      ))}
-    </span>
-  )
-}
+export function BookCard({ book, onOpen }: Props) {
+  const upsertRating = useUpsertRating(book.id)
+  const deleteRating = useDeleteRating(book.id)
 
-export function BookCard({ book }: Props) {
+  const coverUrl = book.isbn
+    ? `https://covers.openlibrary.org/b/isbn/${book.isbn}-M.jpg`
+    : null
+
+  function handleRate(v: number | null) {
+    if (v === null) {
+      deleteRating.mutate()
+    } else {
+      upsertRating.mutate(v)
+    }
+  }
+
   return (
-    <div className="flex items-start justify-between rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-sm">
+    <div
+      className="flex cursor-pointer items-start gap-3 rounded-lg border border-gray-200 bg-white px-3 py-3 shadow-sm transition-shadow hover:shadow-md"
+      onClick={() => onOpen(book)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === 'Enter' && onOpen(book)}
+    >
+      {/* Cover */}
+      {coverUrl ? (
+        <img
+          src={coverUrl}
+          alt=""
+          className="h-16 w-10 flex-shrink-0 rounded object-cover shadow-sm"
+          onError={(e) => {
+            e.currentTarget.style.display = 'none'
+          }}
+        />
+      ) : (
+        <div className="flex h-16 w-10 flex-shrink-0 items-center justify-center rounded bg-indigo-50 text-xl">
+          📖
+        </div>
+      )}
+
+      {/* Content */}
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-gray-900">{book.title}</p>
         <p className="truncate text-xs text-gray-500">{book.author}</p>
-        {book.isbn && <p className="mt-0.5 text-xs text-gray-400">ISBN: {book.isbn}</p>}
-      </div>
-      <div className="ml-3 flex flex-shrink-0 flex-col items-end gap-1">
-        <Stars rating={book.rating} />
-        {book.pages && <span className="text-xs text-gray-400">{book.pages} str.</span>}
+
+        {/* Ratings row */}
+        <div className="mt-1 flex flex-wrap items-center gap-2">
+          <StarRating value={book.avg_rating} count={book.ratings_count} readonly />
+          <span className="text-gray-300">·</span>
+          <span onClick={(e) => e.stopPropagation()}>
+            <StarRating value={book.user_rating} onRate={handleRate} />
+          </span>
+        </div>
+
+        {/* Badges */}
+        <div className="mt-1 flex flex-wrap items-center gap-1.5">
+          {book.genre && (
+            <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs text-indigo-600">
+              {book.genre}
+            </span>
+          )}
+          {book.user_status && (
+            <span className="rounded-full bg-green-50 px-2 py-0.5 text-xs text-green-700">
+              {STATUS_ICONS[book.user_status]} {book.user_status === 'want_to_read' ? 'Chcę przeczytać' : book.user_status === 'reading' ? 'Czytam' : 'Przeczytane'}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   )

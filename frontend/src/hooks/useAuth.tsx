@@ -8,6 +8,8 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>
   register: (name: string, email: string, password: string) => Promise<void>
   logout: () => Promise<void>
+  updateProfile: (data: { name?: string; email?: string }) => Promise<void>
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -45,8 +47,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null)
   }, [])
 
+  const updateProfile = useCallback(async (data: { name?: string; email?: string }) => {
+    const token = authApi.getToken()!
+    const updated = await authApi.updateProfile(data, token)
+    setUser(updated)
+  }, [])
+
+  const changePassword = useCallback(
+    async (currentPassword: string, newPassword: string) => {
+      const token = authApi.getToken()!
+      await authApi.changePassword(currentPassword, newPassword, token)
+    },
+    [],
+  )
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
+    <AuthContext.Provider
+      value={{ user, isLoading, login, register, logout, updateProfile, changePassword }}
+    >
       {children}
     </AuthContext.Provider>
   )

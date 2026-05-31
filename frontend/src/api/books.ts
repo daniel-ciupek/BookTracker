@@ -1,4 +1,5 @@
-import type { AddBookPayload, Book, BooksResponse } from '../types/book'
+import type { AddBookPayload, Book, BooksResponse, ReadingStatus } from '../types/book'
+import type { Review, ReviewsResponse } from '../types/review'
 import { clearToken, getToken } from './auth'
 
 const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
@@ -36,6 +37,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
 
+  if (res.status === 204) return undefined as T
   return res.json() as Promise<T>
 }
 
@@ -43,13 +45,19 @@ export function fetchBooks(params: {
   cursor?: number | null
   limit?: number
   search?: string
+  genre?: string
 }): Promise<BooksResponse> {
   const q = new URLSearchParams()
   if (params.cursor) q.set('cursor', String(params.cursor))
   if (params.limit) q.set('limit', String(params.limit))
   if (params.search) q.set('search', params.search)
+  if (params.genre) q.set('genre', params.genre)
   const qs = q.toString() ? `?${q}` : ''
   return request<BooksResponse>(`/api/books${qs}`)
+}
+
+export function fetchBook(id: number): Promise<Book> {
+  return request<Book>(`/api/books/${id}`)
 }
 
 export function addBook(payload: AddBookPayload): Promise<Book> {
@@ -57,4 +65,44 @@ export function addBook(payload: AddBookPayload): Promise<Book> {
     method: 'POST',
     body: JSON.stringify(payload),
   })
+}
+
+export function upsertRating(bookId: number, value: number): Promise<{ value: number }> {
+  return request(`/api/books/${bookId}/rating`, {
+    method: 'PUT',
+    body: JSON.stringify({ value }),
+  })
+}
+
+export function deleteRating(bookId: number): Promise<void> {
+  return request(`/api/books/${bookId}/rating`, { method: 'DELETE' })
+}
+
+export function fetchReviews(bookId: number, cursor?: number | null): Promise<ReviewsResponse> {
+  const q = new URLSearchParams()
+  if (cursor) q.set('cursor', String(cursor))
+  const qs = q.toString() ? `?${q}` : ''
+  return request<ReviewsResponse>(`/api/books/${bookId}/reviews${qs}`)
+}
+
+export function upsertReview(bookId: number, body: string): Promise<Review> {
+  return request<Review>(`/api/books/${bookId}/reviews`, {
+    method: 'POST',
+    body: JSON.stringify({ body }),
+  })
+}
+
+export function deleteReview(bookId: number): Promise<void> {
+  return request(`/api/books/${bookId}/reviews/mine`, { method: 'DELETE' })
+}
+
+export function upsertStatus(bookId: number, status: ReadingStatus): Promise<{ status: ReadingStatus }> {
+  return request(`/api/books/${bookId}/status`, {
+    method: 'PUT',
+    body: JSON.stringify({ status }),
+  })
+}
+
+export function deleteStatus(bookId: number): Promise<void> {
+  return request(`/api/books/${bookId}/status`, { method: 'DELETE' })
 }

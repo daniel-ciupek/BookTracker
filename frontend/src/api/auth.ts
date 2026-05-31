@@ -15,10 +15,19 @@ export function clearToken(): void {
   localStorage.removeItem(TOKEN_KEY)
 }
 
-async function authRequest<T>(path: string, body: object): Promise<T> {
+async function authRequest<T>(
+  path: string,
+  body: object,
+  method = 'POST',
+  token?: string,
+): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
     body: JSON.stringify(body),
   })
   const data = await res.json()
@@ -54,4 +63,45 @@ export async function me(token: string): Promise<AuthUser> {
   })
   if (!res.ok) throw new Error('Unauthorized')
   return res.json() as Promise<AuthUser>
+}
+
+export function forgotPassword(email: string): Promise<void> {
+  return authRequest('/api/forgot-password', { email })
+}
+
+export function resetPassword(
+  token: string,
+  email: string,
+  password: string,
+): Promise<void> {
+  return authRequest('/api/reset-password', {
+    token,
+    email,
+    password,
+    password_confirmation: password,
+  })
+}
+
+export function updateProfile(
+  data: { name?: string; email?: string },
+  authToken: string,
+): Promise<AuthUser> {
+  return authRequest<AuthUser>('/api/user', data, 'PATCH', authToken)
+}
+
+export function changePassword(
+  currentPassword: string,
+  newPassword: string,
+  authToken: string,
+): Promise<void> {
+  return authRequest(
+    '/api/user/password',
+    {
+      current_password: currentPassword,
+      password: newPassword,
+      password_confirmation: newPassword,
+    },
+    'PUT',
+    authToken,
+  )
 }

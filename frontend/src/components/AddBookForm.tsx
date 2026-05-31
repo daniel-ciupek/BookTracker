@@ -5,6 +5,8 @@ import { ValidationError } from '../api/books'
 import { useAddBook } from '../hooks/useBooks'
 import { isValidIsbn } from '../lib/isbn'
 
+const GENRES = ['Fantastyka', 'Kryminał', 'Romans', 'Thriller', 'Historia', 'Biografia', 'Nauka', 'Inne']
+
 const schema = z.object({
   title: z.string().min(1, 'Tytuł jest wymagany').max(255),
   author: z.string().min(1, 'Autor jest wymagany').max(255),
@@ -16,7 +18,7 @@ const schema = z.object({
     .union([z.coerce.number().int().min(1).max(99999), z.literal('')])
     .optional()
     .transform((v) => (v === '' || v === undefined ? undefined : Number(v))),
-  rating: z.coerce.number().int().min(1, 'Ocena jest wymagana').max(5),
+  genre: z.string().optional(),
 })
 
 type FormInput = z.input<typeof schema>
@@ -40,7 +42,7 @@ export function AddBookForm() {
         author: data.author,
         isbn: data.isbn || undefined,
         pages: data.pages,
-        rating: data.rating,
+        genre: data.genre || undefined,
       })
       reset()
     } catch (err) {
@@ -92,12 +94,12 @@ export function AddBookForm() {
           />
         </Field>
 
-        <Field label="Ocena (1–5) *" error={errors.rating?.message}>
-          <select {...register('rating')} className={input(!!errors.rating)}>
-            <option value="">—</option>
-            {[1, 2, 3, 4, 5].map((n) => (
-              <option key={n} value={n}>
-                {'★'.repeat(n)} ({n})
+        <Field label="Gatunek" error={errors.genre?.message}>
+          <select {...register('genre')} className={input(!!errors.genre)}>
+            <option value="">— wybierz —</option>
+            {GENRES.map((g) => (
+              <option key={g} value={g}>
+                {g}
               </option>
             ))}
           </select>

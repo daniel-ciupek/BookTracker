@@ -4,11 +4,11 @@ import type { AddBookPayload, BooksResponse } from '../types/book'
 
 const BOOKS_KEY = 'books'
 
-export function useBooks(search: string) {
+export function useBooks(search: string, genre?: string) {
   return useInfiniteQuery<BooksResponse>({
-    queryKey: [BOOKS_KEY, search],
+    queryKey: [BOOKS_KEY, search, genre],
     queryFn: ({ pageParam }) =>
-      fetchBooks({ cursor: pageParam as number | null, limit: 50, search }),
+      fetchBooks({ cursor: pageParam as number | null, limit: 50, search, genre }),
     initialPageParam: null,
     getNextPageParam: (last) => last.next_cursor ?? undefined,
   })

@@ -1,15 +1,18 @@
 import { useEffect, useRef } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { useBooks } from '../hooks/useBooks'
+import type { Book } from '../types/book'
 import { BookCard } from './BookCard'
 
 interface Props {
   search: string
+  genre?: string
+  onOpenBook: (book: Book) => void
 }
 
-export function BookList({ search }: Props) {
+export function BookList({ search, genre, onOpenBook }: Props) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } =
-    useBooks(search)
+    useBooks(search, genre)
 
   const allBooks = data?.pages.flatMap((p) => p.data) ?? []
 
@@ -19,7 +22,7 @@ export function BookList({ search }: Props) {
   const virtualizer = useVirtualizer({
     count: allBooks.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 76,
+    estimateSize: () => 88,
     overscan: 10,
   })
 
@@ -74,7 +77,7 @@ export function BookList({ search }: Props) {
               padding: '4px 0',
             }}
           >
-            <BookCard book={allBooks[item.index]} />
+            <BookCard book={allBooks[item.index]} onOpen={onOpenBook} />
           </div>
         ))}
       </div>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useDeleteRating, useUpsertRating } from '../hooks/useRating'
 import { useDeleteReview, useReviews, useUpsertReview } from '../hooks/useReviews'
 import { useDeleteStatus, useUpsertStatus } from '../hooks/useReadingStatus'
@@ -7,6 +7,7 @@ import type { Review } from '../types/review'
 import { useAuth } from '../hooks/useAuth'
 import { ReviewCard } from './ReviewCard'
 import { StarRating } from './StarRating'
+import { ImageWithFallback } from './ImageWithFallback'
 
 const STATUS_LABELS: Record<ReadingStatus, string> = {
   want_to_read: 'Chcę przeczytać',
@@ -84,9 +85,7 @@ export function BookDetailModal({ book, onClose }: Props) {
     await deleteReview.mutateAsync()
   }
 
-  const coverUrl = book.isbn
-    ? `https://covers.openlibrary.org/b/isbn/${book.isbn}-M.jpg`
-    : null
+  const coverUrl = book.isbn ? `https://covers.openlibrary.org/b/isbn/${book.isbn}-M.jpg` : null
 
   return (
     <div
@@ -109,20 +108,16 @@ export function BookDetailModal({ book, onClose }: Props) {
 
         {/* Header */}
         <div className="flex gap-4 p-6">
-          {coverUrl ? (
-            <img
-              src={coverUrl}
-              alt={`Okładka: ${book.title}`}
-              className="h-36 w-24 flex-shrink-0 rounded-md object-cover shadow"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none'
-              }}
-            />
-          ) : (
-            <div className="flex h-36 w-24 flex-shrink-0 items-center justify-center rounded-md bg-indigo-50 text-3xl shadow">
-              📖
-            </div>
-          )}
+          <ImageWithFallback
+            src={coverUrl || undefined}
+            alt={`Okładka: ${book.title}`}
+            className="h-36 w-24 flex-shrink-0 rounded-md object-cover shadow"
+            fallback={
+              <div className="flex h-36 w-24 flex-shrink-0 items-center justify-center rounded-md bg-indigo-50 text-3xl shadow">
+                📖
+              </div>
+            }
+          />
           <div className="min-w-0 flex-1">
             <h2 className="text-xl font-bold text-gray-900">{book.title}</h2>
             <p className="mt-0.5 text-base text-gray-600">{book.author}</p>

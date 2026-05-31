@@ -1,6 +1,8 @@
+import React from 'react'
 import { useDeleteRating, useUpsertRating } from '../hooks/useRating'
 import type { Book, ReadingStatus } from '../types/book'
 import { StarRating } from './StarRating'
+import { ImageWithFallback } from './ImageWithFallback'
 
 const STATUS_ICONS: Record<ReadingStatus, string> = {
   want_to_read: '🔖',
@@ -17,9 +19,7 @@ export function BookCard({ book, onOpen }: Props) {
   const upsertRating = useUpsertRating(book.id)
   const deleteRating = useDeleteRating(book.id)
 
-  const coverUrl = book.isbn
-    ? `https://covers.openlibrary.org/b/isbn/${book.isbn}-M.jpg`
-    : null
+  const coverUrl = book.isbn ? `https://covers.openlibrary.org/b/isbn/${book.isbn}-M.jpg` : null
 
   function handleRate(v: number | null) {
     if (v === null) {
@@ -38,20 +38,16 @@ export function BookCard({ book, onOpen }: Props) {
       onKeyDown={(e) => e.key === 'Enter' && onOpen(book)}
     >
       {/* Cover */}
-      {coverUrl ? (
-        <img
-          src={coverUrl}
-          alt=""
-          className="h-16 w-10 flex-shrink-0 rounded object-cover shadow-sm"
-          onError={(e) => {
-            e.currentTarget.style.display = 'none'
-          }}
-        />
-      ) : (
-        <div className="flex h-16 w-10 flex-shrink-0 items-center justify-center rounded bg-indigo-50 text-xl">
-          📖
-        </div>
-      )}
+      <ImageWithFallback
+        src={coverUrl || undefined}
+        alt=""
+        className="h-16 w-10 flex-shrink-0 rounded object-cover shadow-sm"
+        fallback={
+          <div className="flex h-16 w-10 flex-shrink-0 items-center justify-center rounded bg-indigo-50 text-xl">
+            📖
+          </div>
+        }
+      />
 
       {/* Content */}
       <div className="min-w-0 flex-1">

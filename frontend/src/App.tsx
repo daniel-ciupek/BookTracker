@@ -39,7 +39,7 @@ export default function App() {
           </div>
           <div className="flex items-center gap-3">
             <span className="hidden text-sm font-medium text-slate-500 dark:text-slate-400 sm:inline">
-              {user.email}
+              {user.name}
             </span>
             
             <button

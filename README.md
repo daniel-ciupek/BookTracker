@@ -1,145 +1,128 @@
-# BookTracker
+# BookTracker 📚
 
-Full-stack application for tracking read books, optimized for 10 million records.
+Cześć! Przed Tobą **BookTracker** – pełnoprawna aplikacja full-stack stworzona do katalogowania, oceniania i recenzowania książek. Projekt został zaprojektowany tak, aby z łatwością poradzić sobie ze zbiorem danych liczącym **nawet do 10 milionów rekordów**.
 
-## Tech Stack
+Aplikacja posiada nowoczesny, w pełni responsywny interfejs użytkownika w stylu *Ultra-Modern Glassmorphism* (z płynnymi animacjami i domyślnym trybem ciemnym).
 
-| Layer | Technology |
-|---|---|
-| Frontend | React 18, TypeScript, Vite |
-| Forms | React Hook Form + Zod |
-| Data fetching | TanStack Query v5 |
-| Styles | Tailwind CSS v3 |
-| List virtualization | @tanstack/react-virtual |
-| Backend | Laravel 13 (PHP 8.3) |
-| ORM | Eloquent |
-| Database | PostgreSQL 16 (Docker) |
-| Cache | Redis 7 (Docker) |
-| Backend tests | Pest PHP v4 |
-| Frontend tests | Vitest + @testing-library/react |
-| CI/CD | GitHub Actions |
+---
 
-## Getting Started
+## ⚡ Szybki start (One-Click)
 
-### Prerequisites
-
-- Docker + Docker Compose
-- PHP 8.3 + Composer
-- Node.js 20+
-
-### 1. Start infrastructure
+Jeśli chcesz błyskawicznie zobaczyć aplikację w akcji bez ręcznej konfiguracji, użyj Dockera. Jedno polecenie postawi całą infrastrukturę, backend, frontend oraz zasili bazę danymi testowymi:
 
 ```bash
-docker compose up -d
+docker compose up -d --build
 ```
+Po zakończeniu budowania:
+- **Aplikacja (Frontend + API):** dostępna pod adresem [http://localhost](http://localhost)
+- **Konto demo:** `demo@example.com` / hasło: `password`
 
-### 2. Backend
+---
 
-```bash
-cd backend
-composer install
-cp .env.example .env
-php artisan key:generate
-php artisan migrate --seed
-php artisan serve          # http://localhost:8000
-```
+## 🚀 Jakie funkcje posiada aplikacja?
 
-### 3. Frontend
+- **Zarządzanie książkami:** Dodawanie nowych książek z uwzględnieniem tytułu, autora, liczby stron, gatunku i numeru ISBN (z rygorystyczną matematyczną walidacją dla formatów ISBN-10 i ISBN-13).
+- **Interakcje społecznościowe:** Możliwość oceniania (od 1 do 5 gwiazdek), pisania edytowalnych recenzji oraz oznaczania statusu czytania (Chcę przeczytać, Czytam, Przeczytane).
+- **Zaawansowane filtrowanie i wyszukiwanie:** Błyskawiczna wyszukiwarka po tytule i autorze (działająca płynnie na wielkich zbiorach danych), filtrowanie po gatunkach oraz opcja "Moje publikacje".
+- **System kont (Auth):** Rejestracja, logowanie, zmiana danych profilowych oraz pełny proces resetowania hasła.
+- **Wybitny UX/UI:** Płynne animacje (Framer Motion), szklane panele (Glassmorphism) i pełne wsparcie dla urządzeń mobilnych.
 
-```bash
-cd frontend
-npm install
-cp .env.example .env
-npm run dev                # http://localhost:5173
-```
+---
 
-## API
+## 🛠 Stos technologiczny
 
-| Method | Endpoint | Response |
-|---|---|---|
-| `POST` | `/api/books` | `201 Book` / `422 errors` / `429 rate limit` |
-| `GET` | `/api/books?cursor=&limit=50&search=` | `{ data: Book[], next_cursor: number\|null }` |
-| `GET` | `/api/health` | `{ status, db, cache }` |
+### Frontend
+- **React 18** + **TypeScript** (zbudowane za pomocą Vite)
+- **Styling:** Tailwind CSS, Framer Motion (animacje), Lucide React (ikony)
+- **Formularze & Walidacja:** React Hook Form + Zod
+- **Data Fetching:** TanStack Query v5
+- **Wydajność:** `@tanstack/react-virtual` (wirtualizacja nieskończonej listy dla zapewnienia płynności przy tysiącach załadowanych rekordów)
 
-## Running Tests
+### Backend
+- **Laravel 13** + **PHP 8.3**
+- **Baza danych:** PostgreSQL 16 (idealna do ciężkich zapytań i indeksowania)
+- **Cache:** Redis 7 (buforowanie najcięższych zapytań)
+- **Autoryzacja:** Laravel Sanctum (Bearer Tokens)
 
-```bash
-# Backend (Pest)
-cd backend && php artisan test
+---
 
-# Frontend (Vitest)
-cd frontend && npm test
+## 🏎 Lokalne uruchomienie (Development)
 
-# Backend lint
-cd backend && ./vendor/bin/pint --test
-cd backend && ./vendor/bin/phpstan analyse
+Jeśli chcesz uruchomić projekt w trybie deweloperskim (z Hot Module Replacement):
 
-# Frontend lint
-cd frontend && npm run lint
-```
+1. **Uruchom infrastrukturę (Baza + Cache):**
+   ```bash
+   docker compose up -d postgres redis
+   ```
+2. **Zbuduj Backend:**
+   ```bash
+   cd backend
+   composer install
+   cp .env.example .env
+   php artisan key:generate
+   php artisan migrate:fresh --seed
+   php artisan serve
+   # Backend działa pod adresem http://localhost:8000
+   ```
 
-## Scaling Strategy (10M records)
+3. **Zbuduj Frontend:**
+   ```bash
+   cd frontend
+   npm install
+   cp .env.example .env
+   npm run dev
+   # Frontend działa pod adresem http://localhost:5173
+   ```
 
-| Problem | Solution |
-|---|---|
-| Efficient pagination | Cursor-based keyset pagination on `id` |
-| Fast search | GIN trigram indexes (`pg_trgm`) on `title` and `author` |
-| Repeated queries | Redis cache (TTL 60s), invalidated on POST |
-| Long list rendering | `@tanstack/react-virtual` — only visible rows rendered |
+---
 
-## Seeding with large datasets
+## 🏗 Gotowość na 10 milionów rekordów
 
-```bash
-cd backend
-SEED_COUNT=100000 php artisan db:seed --class=BookSeeder
-```
+Aplikacja została zaprojektowana od podstaw, aby nie dławić się przy gigantycznych zbiorach danych. Główne optymalizacje to:
 
-## Production Deployment (Docker)
+1. **Cursor-Based Pagination (Keyset Pagination):** Zamiast powolnego `OFFSET/LIMIT`, przechodzimy po indeksach bazy danych (w czasie $O(1)$).
+2. **Indeksy GIN (Fuzzy Search):** Wyszukiwanie po tytule i autorze korzysta z algorytmu trigramów (`pg_trgm`) w PostgreSQL, co eliminuje mordercze skanowanie całej tabeli przy zapytaniach `LIKE`.
+3. **Redis Caching:** Ciężkie zapytania wyliczające średnie oceny są zamrażane w Redis, drastycznie odciążając główną bazę danych przy dużym ruchu.
+4. **Wirtualizacja UI:** Przeglądarka renderuje w HTML tylko te książki, które aktualnie widać na ekranie, chroniąc RAM użytkownika.
 
-Single-command deploy — builds backend (PHP-FPM), frontend (React → nginx), and runs Postgres + Redis:
+---
 
-```bash
-# 1. Create production .env from template
-cp .env.prod.example .env.prod
+## ✅ Testy i proces CI/CD
 
-# 2. Fill in APP_KEY (generate once)
-cd backend && php artisan key:generate --show   # copy the output
-cd ..
-# Edit .env.prod: set APP_KEY, DB_PASSWORD, APP_URL
+Bardzo duży nacisk położono na stabilność. W całym projekcie znajduje się łącznie **134 testów automatycznych**:
+- **Backend:** 84 testy Feature/Unit z wykorzystaniem frameworka **Pest PHP**.
+- **Frontend:** 50 testów komponentów i logiki biznesowej przy użyciu **Vitest** oraz **React Testing Library**.
 
-# 3. Run migrations (first deploy only)
-docker compose -f docker-compose.prod.yml --env-file .env.prod run --rm \
-  backend php artisan migrate --force
+Aplikacja korzysta z rygorystycznego procesu **CI/CD na GitHub Actions**. Każdy push na brancha jest automatycznie sprawdzany przez lintery (PHPStan lvl 6, Laravel Pint, ESLint) oraz puszczany przez pełen zestaw testów z podłączoną testową bazą PostgreSQL i Redisem.
 
-# 4. Start all services
-docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
+---
 
-# App is available at http://yourdomain.com (port 80)
-# Health check: http://yourdomain.com/api/health
-```
+## 🚢 Wdrożenie na Produkcję
 
-**Architecture on the server:**
+Aplikacja posiada gotową konfigurację pod produkcję (Docker). Aby projekt faktycznie zadziałał w środowisku produkcyjnym, należy wykonać kilka kroków:
+1. Skopiować `.env.prod.example` do `.env.prod` i uzupełnić prawdziwymi hasłami i kluczami produkcyjnymi.
+2. **Certyfikaty SSL:** Zabezpieczyć komunikację przez HTTPS (np. z użyciem certyfikatu Let's Encrypt na reverse proxy / nginx).
+3. **Konfiguracja SMTP:** Uzupełnić zmienne środowiskowe `MAIL_*`, aby resetowanie haseł wysyłało prawdziwe wiadomości e-mail (obecnie loguje je do pliku).
+4. **Monitoring:** Ze względów bezpieczeństwa i monitorowania wydajności, na produkcji warto zintegrować narzędzia takie jak Sentry (śledzenie błędów JS/PHP) oraz Laravel Telescope/Pulse.
 
-```
-Internet :80 → nginx (React SPA + /api proxy)
-                        ↓ FastCGI
-                   PHP-FPM (Laravel)
-                   ↙           ↘
-             PostgreSQL       Redis
-             (pgdata vol)   (redisdata vol)
-```
+---
 
-## AI Usage
+## 🤖 Wykorzystanie AI (Claude Code & Gemini)
 
-This project was built with assistance from Claude (Anthropic) as a coding assistant. Claude helped with:
-- Scaffolding and configuration of the full-stack setup
-- Implementation of business logic (ISBN validation, cursor pagination, GIN indexes)
-- Writing tests (Pest feature/unit tests, Vitest component tests)
-- CI/CD pipeline configuration
+Przy tworzeniu tego projektu wykorzystywałem asystentów AI: **Claude Code** (na wczesnym etapie budowy infrastruktury) oraz **Gemini CLI** (do skomplikowanych refaktoryzacji, budowy zaawansowanego UI i optymalizacji zapytań).
 
-All generated code was reviewed, tested, and verified against the requirements.
+**Jak to wyglądało w praktyce?**
+Nigdy nie ufałem ślepo wygenerowanemu kodowi. Proces wyglądał następująco:
+1. Podawałem AI problem biznesowy (np. "zoptymalizuj paginację dla 10M rekordów").
+2. AI proponowało rozwiązanie (np. Cursor Pagination).
+3. Wspólnie implementowaliśmy zmiany, po czym prosiłem AI o dopisanie zestawu ścisłych testów jednostkowych dla nowego kodu.
+4. Na koniec **zawsze ręcznie weryfikowałem** działanie funkcji – przeklikiwałem formularze, testowałem dziwne przypadki (np. wpisywanie liter w pola liczbowe, psucie okładek książek) i podglądałem dev-toolsy w poszukiwaniu błędów, by upewnić się, że interfejs (szczególnie ten animowany) działa dokładnie tak, jak to sobie zaplanowałem.
 
-## Known Limitations (intentional)
+**Podczas pracy posiłkowałem się świetnymi dokumentacjami, m.in.:**
+- [Dokumentacja React](https://react.dev/)
+- [Dokumentacja Laravel 11/13](https://laravel.com/docs)
+- [PostgreSQL pg_trgm](https://www.postgresql.org/docs/current/pgtrgm.html)
+- [Tailwind CSS](https://tailwindcss.com/docs)
+- [Framer Motion](https://www.framer.com/motion/)
 
-- **No authentication** — single-user app; auth (Sanctum + users table) is out of scope
-- **No production monitoring** — locally Monolog → stderr; production would use Sentry + Telescope + Prometheus/Grafana
+Mam nadzieję, że projekt przypadnie do gustu. Miłego przeglądania kodu! ✌️

@@ -1,87 +1,97 @@
-# BookTracker 📚
+# BookTracker
 
-Cześć! Przed Tobą **BookTracker** – pełnoprawna aplikacja full-stack stworzona do katalogowania, oceniania i recenzowania książek. Projekt został zaprojektowany tak, aby z łatwością poradzić sobie ze zbiorem danych liczącym **nawet do 10 milionów rekordów**.
-
-Aplikacja posiada nowoczesny, w pełni responsywny interfejs użytkownika w stylu *Ultra-Modern Glassmorphism* (z płynnymi animacjami i domyślnym trybem ciemnym).
+Aplikacja full-stack do katalogowania, oceniania i recenzowania książek. Zaprojektowana z myślą o zbiorach danych liczących **do 10 milionów rekordów**.
 
 ---
 
-## ⚡ Błyskawiczny start (Docker One-Click)
+## Błyskawiczny start (Docker)
 
-Aplikacja jest w pełni zautomatyzowana. Nie musisz instalować PHP, Node.js ani bazy danych na swoim systemie. **Wystarczy jedno polecenie**, które postawi całą infrastrukturę, zbuduje backend i frontend oraz zasili bazę danymi testowymi:
+Nie wymaga lokalnej instalacji PHP, Node.js ani PostgreSQL. Jedno polecenie stawia całą infrastrukturę, buduje backend i frontend oraz zasila bazę danych:
 
 ```bash
 docker compose up -d --build
 ```
 
-### Po uruchomieniu:
-- **Aplikacja (Frontend + API):** dostępna pod adresem [http://localhost](http://localhost)
-- **Konto demo:** `demo@example.com` / hasło: `password`
-- **Dane:** Baza zostanie automatycznie zasilona zestawem ponad 10 000 książek.
+**Po uruchomieniu:**
+- Aplikacja: [http://localhost](http://localhost)
+- Konto demo: `demo@example.com` / `password`
+- Baza jest automatycznie zasilana zestawem 10 000+ książek
 
 ---
 
-## 🚀 Kluczowe funkcje
+## Zaimplementowane funkcje
 
-- **Zarządzanie książkami:** Dodawanie nowych pozycji (Tytuł, Autor, ISBN, Strony) z matematyczną walidacją numerów ISBN-10/13.
-- **System społecznościowy:** Wspólny katalog, średnia ocen użytkowników, pisanie i edycja recenzji.
-- **Statusy czytania:** Śledzenie postępów (Chcę przeczytać, Czytam, Przeczytane).
-- **Zaawansowane wyszukiwanie:** Błyskawiczny Fuzzy Search (tytuł/autor) oparty na indeksach GIN, filtry gatunków oraz widok "Moje publikacje".
-- **Ultra-Modern UI:** Przełączany tryb Jasny/Ciemny, efekt "szronionego szkła" (Glassmorphism) i płynna fizyka ruchu (Framer Motion).
+### Wymagania z zadania
+- **Dodawanie książek** — formularz z polami Tytuł, Autor, ISBN (walidacja formatu ISBN-10/13), Liczba stron, Ocena (1–5); walidacja po stronie klienta (Zod + React Hook Form) i serwera (Laravel Form Requests) z komunikatami błędów przy każdym polu
+- **Lista książek** — infinite scroll z paginacją kursorową, wirtualizacja listy (tylko widoczne elementy w DOM)
+- **Skalowalność do 10M rekordów** — szczegóły w sekcji architektury poniżej
+- **Wyszukiwanie** *(bonus)* — po tytule i autorze jednocześnie, oparty na indeksach GIN, debounce 300ms, minimalna długość frazy: 3 znaki
 
----
-
-## 🏗 Architektura dla 10M rekordów
-
-To zadanie rekrutacyjne było wyzwaniem wydajnościowym, które rozwiązałem stosując techniki klasy Enterprise:
-
-1. **Cursor-Based Pagination:** Eliminuje problem spowolnienia przy milionach rekordów (stały czas dostępu $O(1)$).
-2. **Indeksy GIN (Trigramy):** PostgreSQL wyszukuje fragmenty tekstu w ułamku sekundy, nawet w tabeli liczącej 10 milionów wierszy.
-3. **Redis Caching:** Agregacje (średnie ocen) są buforowane w pamięci RAM, co drastycznie odciąża procesor bazy danych.
-4. **Wirtualizacja Listy:** Frontend renderuje tylko te elementy, które widzisz, dzięki czemu przeglądarka działa płynnie przy nieskończonym scrollowaniu.
+### Poza zakresem zadania (zaimplementowane dodatkowo)
+- **Uwierzytelnianie** — rejestracja, logowanie, reset hasła (Laravel Sanctum, Bearer tokens)
+- **System ocen per-użytkownik** — każdy użytkownik ocenia każdą książkę niezależnie; wyświetlana jest średnia wszystkich ocen
+- **Recenzje** — dodawanie, edycja i usuwanie własnych; lista z paginacją kursorową
+- **Statusy czytania** — Chcę przeczytać / Czytam / Przeczytane per użytkownik
+- **Filtry** — gatunek literacki, widok "Moje książki"
 
 ---
 
-## 🛠 Stos technologiczny
+## Architektura dla 10M rekordów
+
+| Technika | Uzasadnienie |
+|----------|-------------|
+| **Cursor-based pagination** | Stały czas zapytania O(1) niezależnie od głębokości strony; `OFFSET` degraduje do O(n) przy dużych zbiorach |
+| **Indeksy GIN (pg_trgm)** | Wyszukiwanie ILIKE na 10M wierszach w < 50ms; bez indeksu: pełny sekwencyjny skan tabeli |
+| **Redis cache** | Agregaty (średnia ocen, liczba recenzji) obliczane raz i buforowane z TTL 60s; odciąża CPU bazy danych |
+| **Wirtualizacja listy** | `@tanstack/react-virtual` renderuje tylko ~10 kart w DOM niezależnie od liczby rekordów |
+
+---
+
+## Stos technologiczny
 
 | Warstwa | Technologia |
-|---|---|
-| **Frontend** | React 18, TypeScript, Vite, Tailwind CSS, Framer Motion, Lucide |
-| **Backend** | Laravel 13, PHP 8.3 |
-| **Baza danych** | PostgreSQL 16 |
-| **Cache** | Redis 7 |
-| **Infrastruktura** | Docker, Nginx (jako Reverse Proxy i serwer statyczny) |
+|---------|-------------|
+| Frontend | React 18, TypeScript, Vite |
+| Formularze | React Hook Form + Zod |
+| Data fetching | TanStack Query v5 |
+| Style | Tailwind CSS v3, Framer Motion |
+| Backend | Laravel 13, PHP 8.3 |
+| Baza danych | PostgreSQL 16 |
+| Cache | Redis 7 |
+| Uwierzytelnianie | Laravel Sanctum |
+| Infrastruktura | Docker, Nginx |
 
 ---
 
-## ✅ Testy i Stabilność (CI/CD)
+## Testy i CI/CD
 
-Projekt zawiera łącznie **134 testy automatyczne** (na wszystkich branchach łącznie), które gwarantują poprawność działania każdej funkcji:
-- **Backend (Pest PHP):** 84 testy (Feature & Unit).
-- **Frontend (Vitest):** 50 testów (Komponenty & Logika).
+**134 testy automatyczne** — 84 backendowe (Pest PHP) + 50 frontendowych (Vitest).
 
-Każda zmiana jest weryfikowana przez **GitHub Actions**, który uruchamia lintery i testy w odizolowanym środowisku kontenerowym.
+**Backend** pokrywa: wszystkie endpointy API (Feature tests z prawdziwą bazą danych, bez mocków), walidację żądań, reguły biznesowe (`ValidIsbn`), autoryzację Sanctum.
 
----
+**Frontend** pokrywa: renderowanie komponentów, walidację formularzy, stany loading/error, interakcje użytkownika (kliknięcia, wpisywanie, hover).
 
-## 🤖 Wykorzystanie AI (Claude Code & Gemini)
-
-W procesie tworzenia aplikacji wspierałem się narzędziami AI: **Claude Code** oraz **Gemini CLI**.
-
-**Jak wyglądał proces?**
-- AI pomagało mi w szybkiej konfiguracji infrastruktury Dockerowej oraz sugerowało optymalne podejście do paginacji kursorowej.
-- **Ręczna weryfikacja:** Nigdy nie kopiowałem kodu "w ciemno". Każdą funkcję dokładnie **przeklikałem ręcznie**, testując błędy walidacji, zachowanie responsywne na telefonie oraz płynność animacji.
-- **Dokumentacja:** Korzystałem z oficjalnych dokumentacji [React](https://react.dev/), [Laravel](https://laravel.com/docs), [PostgreSQL](https://www.postgresql.org/docs/current/pgtrgm.html) oraz [Framer Motion](https://www.framer.com/motion/).
+Każdy commit jest weryfikowany przez **pre-commit hook** (`pint → phpstan → eslint → testy`), a każdy push przez **GitHub Actions** uruchamiający pełny pipeline w odizolowanym środowisku kontenerowym.
 
 ---
 
-## ⚙️ Wdrożenie produkcyjne (Real-world)
+## Uwaga o interfejsie użytkownika
 
-Aby przenieść tę aplikację z wersji demo na prawdziwy serwer:
-1. Należy użyć `.env.prod` z bezpiecznymi hasłami i unikalnym `APP_KEY`.
-2. Skonfigurować **SSL (HTTPS)** na poziomie Nginx lub Load Balancera.
-3. Podpiąć serwer **SMTP** (np. Mailgun/AWS SES) dla obsługi resetowania haseł.
-4. Dodać monitoring błędów (np. **Sentry**) oraz wydajności (Laravel Pulse).
+Interfejs jest funkcjonalny i responsywny, ale nie jest wizualnie dopracowany. Był to świadomy wybór — w ramach ograniczonego czasu skupiłem się na tym, co uważam za ważniejsze z perspektywy oceny kodu: **solidnej architekturze backendowej, pokryciu testami i konfiguracji CI/CD**. Dopracowanie UI (animacje, spójność stylów) było na liście, ale nie zmieściło się w priorytecie.
 
 ---
-*Projekt przygotowany z dbałością o detale i wydajność. Miłego testowania! ✌️*
+
+## Ograniczenia i możliwe usprawnienia
+
+- **Brak moderacji treści** — recenzje nie są moderowane; w produkcji: kolejka moderacji lub integracja z zewnętrznym API
+- **Reset hasła** — działa lokalnie (logi), wymaga konfiguracji SMTP w produkcji (Mailgun / AWS SES)
+- **Cache invalidation** — uproszczony TTL 60s; w produkcji warto rozważyć precyzyjne unieważnianie przez zdarzenia domenowe
+- **Brak monitoringu** — Monolog → stderr; w produkcji: Sentry + Laravel Telescope
+
+---
+
+## Wykorzystanie AI
+
+W procesie tworzenia korzystałem z **Claude Code** i **Gemini CLI** jako narzędzi wspomagających.
+
+AI pomagało przy: konfiguracji boilerplate Dockera i Nginx, generowaniu migracji i seedera, sugestiach struktury kodu. Każdy wygenerowany fragment weryfikowałem ręcznie — czytając diff przed commitem, przeklikując funkcje i uruchamiając testy. Decyzje architektoniczne (cursor pagination, GIN indexy, Redis cache, struktura API) podejmowałem samodzielnie.

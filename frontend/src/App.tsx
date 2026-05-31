@@ -32,15 +32,15 @@ export default function App() {
   if (!user) return <LoginPage />
 
   return (
-    <div className="min-h-screen transition-colors duration-500">
-      <header className="glass-panel sticky top-0 z-40 mx-4 mt-4 rounded-2xl px-6 py-4">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <div className="flex items-center gap-2.5 text-indigo-600 dark:text-indigo-400">
-            <Library size={28} strokeWidth={2.5} className="drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]" />
-            <h1 className="text-xl font-extrabold tracking-tight">BookTracker</h1>
+    <div className="min-h-screen transition-colors duration-500 pb-12">
+      <header className="glass-panel sticky top-0 z-40 mx-2 mt-2 sm:mx-4 sm:mt-4 rounded-xl sm:rounded-2xl px-4 py-3 sm:px-6 sm:py-4">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
+          <div className="flex items-center gap-2 sm:gap-2.5 text-indigo-600 dark:text-indigo-400">
+            <Library size={24} strokeWidth={2.5} className="drop-shadow-[0_0_8px_rgba(99,102,241,0.5)] sm:w-[28px] sm:h-[28px]" />
+            <h1 className="text-lg sm:text-xl font-extrabold tracking-tight">BookTracker</h1>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="hidden text-sm font-medium text-slate-500 dark:text-slate-400 sm:inline">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span className="hidden text-sm font-medium text-slate-500 dark:text-slate-400 lg:inline">
               {user.name}
             </span>
             
@@ -48,7 +48,7 @@ export default function App() {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="glass-icon-btn"
+              className="glass-icon-btn h-8 w-8 sm:h-9 sm:w-9"
               aria-label="Przełącz motyw"
             >
               {theme === 'dark' ? <Sun size={18} strokeWidth={2.5} /> : <Moon size={18} strokeWidth={2.5} />}
@@ -59,57 +59,64 @@ export default function App() {
               whileTap={{ scale: 0.95 }}
               onClick={() => setOnlyMine(!onlyMine)} 
               className={[
-                "glass-button-secondary",
+                "glass-button-secondary px-2 sm:px-4 h-8 sm:h-auto",
                 onlyMine ? "bg-indigo-500/20 border-indigo-500/50 text-indigo-600 dark:text-indigo-400" : ""
               ].join(" ")}
             >
               <Layout size={16} strokeWidth={2.5} />
-              <span className="hidden sm:inline">{onlyMine ? 'Wszystkie' : 'Moje publikacje'}</span>
+              <span className="hidden md:inline ml-1.5">{onlyMine ? 'Wszystkie' : 'Moje publikacje'}</span>
             </motion.button>
 
             <motion.button 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setShowSettings(true)} 
-              className="glass-button-secondary"
+              className="glass-button-secondary px-2 sm:px-4 h-8 sm:h-auto"
+              title="Ustawienia"
             >
               <Settings size={16} strokeWidth={2.5} />
-              <span className="hidden sm:inline">Ustawienia</span>
+              <span className="hidden md:inline ml-1.5">Ustawienia</span>
             </motion.button>
             
             <motion.button 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => void logout()} 
-              className="glass-button-secondary text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
+              className="glass-button-secondary px-2 sm:px-4 h-8 sm:h-auto text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
+              title="Wyloguj"
             >
               <LogOut size={16} strokeWidth={2.5} />
-              <span className="hidden sm:inline">Wyloguj</span>
+              <span className="hidden md:inline ml-1.5">Wyloguj</span>
             </motion.button>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl gap-8 p-6 md:grid md:grid-cols-[380px_1fr]">
-        <aside className="glass-panel h-fit rounded-3xl p-6">
+      <main className="mx-auto max-w-6xl gap-6 sm:gap-8 p-4 sm:p-6 md:grid md:grid-cols-[340px_1fr] lg:grid-cols-[380px_1fr]">
+        <aside className="glass-panel h-fit rounded-2xl sm:rounded-3xl p-5 sm:p-6 mb-6 md:mb-0">
           <AddBookForm />
         </aside>
 
-        <section>
-          <div className="mb-6 flex gap-4">
+        <section className="min-w-0">
+          <div className="mb-6 flex flex-col sm:flex-row gap-3 sm:gap-4">
             <div className="flex-1">
               <SearchBar onSearch={setSearch} />
             </div>
-            <select
-              value={genre}
-              onChange={(e) => setGenre(e.target.value)}
-              className="glass-input w-48 appearance-none"
-            >
-              <option value="">Wszystkie gatunki</option>
-              {GENRES.map((g) => (
-                <option key={g} value={g}>{g}</option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                value={genre}
+                onChange={(e) => setGenre(e.target.value)}
+                className="glass-input sm:w-48 appearance-none pr-10"
+              >
+                <option value="">Wszystkie gatunki</option>
+                {GENRES.map((g) => (
+                  <option key={g} value={g}>{g}</option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400 dark:text-slate-500">
+                <Layout size={14} strokeWidth={2.5} />
+              </div>
+            </div>
           </div>
           <BookList search={search} genre={genre || undefined} onlyMine={onlyMine} onOpenBook={setSelectedBook} />
         </section>

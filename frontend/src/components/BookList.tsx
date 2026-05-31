@@ -65,7 +65,7 @@ export function BookList({ search, genre, onlyMine, onOpenBook }: Props) {
   }
 
   return (
-    <div ref={parentRef} className="overflow-y-auto" style={{ height: 'calc(100vh - 180px)' }}>
+    <div ref={parentRef} className="overflow-y-auto h-[500px] md:h-[calc(100vh-210px)] rounded-2xl">
       <div
         style={{ height: virtualizer.getTotalSize(), position: 'relative' }}
         aria-label="Lista książek"

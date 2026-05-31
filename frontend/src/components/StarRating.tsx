@@ -39,7 +39,7 @@ export function StarRating({ value, count, readonly = false, onRate }: Props) {
 
   return (
     <span
-      className="inline-flex items-center gap-0.5"
+      className="inline-flex items-center gap-0 sm:gap-0.5"
       onMouseLeave={() => setHovered(null)}
       onClick={(e) => e.stopPropagation()}
     >
@@ -53,11 +53,11 @@ export function StarRating({ value, count, readonly = false, onRate }: Props) {
             onMouseEnter={() => setHovered(star)}
             onClick={() => onRate?.(value === star ? null : star)}
             className={[
-              'transition-all duration-300 hover:scale-125 focus:outline-none',
+              'p-1.5 sm:p-1 transition-all duration-300 hover:scale-125 focus:outline-none',
               star <= display ? 'text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.8)]' : 'text-slate-300 dark:text-slate-600 hover:text-amber-300',
             ].join(' ')}
           >
-            <Star size={22} className={star <= display ? 'fill-amber-400' : 'fill-transparent'} strokeWidth={1.5} />
+            <Star size={24} className={star <= display ? 'fill-amber-400' : 'fill-transparent'} strokeWidth={1.5} />
           </button>
         )
       })}

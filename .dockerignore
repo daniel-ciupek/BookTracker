@@ -24,6 +24,12 @@ frontend/coverage/
 .git
 .gitignore
 
+# Prod env (never bake into image)
+.env
+.env.prod
+backend/.env
+backend/.env.production
+
 # General
 .DS_Store
 *.log

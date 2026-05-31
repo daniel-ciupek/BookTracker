@@ -19,7 +19,8 @@ const schema = z.object({
   rating: z.coerce.number().int().min(1, 'Ocena jest wymagana').max(5),
 })
 
-type FormValues = z.infer<typeof schema>
+type FormInput = z.input<typeof schema>
+type FormOutput = z.output<typeof schema>
 
 export function AddBookForm() {
   const {
@@ -28,11 +29,11 @@ export function AddBookForm() {
     reset,
     setError,
     formState: { errors, isSubmitting },
-  } = useForm<FormValues>({ resolver: zodResolver(schema) })
+  } = useForm<FormInput, unknown, FormOutput>({ resolver: zodResolver(schema) })
 
   const mutation = useAddBook()
 
-  async function onSubmit(data: FormValues) {
+  async function onSubmit(data: FormOutput) {
     try {
       await mutation.mutateAsync({
         title: data.title,
@@ -45,7 +46,7 @@ export function AddBookForm() {
     } catch (err) {
       if (err instanceof ValidationError) {
         Object.entries(err.errors).forEach(([field, messages]) => {
-          setError(field as keyof FormValues, { message: messages[0] })
+          setError(field as keyof FormInput, { message: messages[0] })
         })
       }
     }

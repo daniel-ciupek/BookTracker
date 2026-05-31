@@ -94,6 +94,41 @@ cd backend
 SEED_COUNT=100000 php artisan db:seed --class=BookSeeder
 ```
 
+## Production Deployment (Docker)
+
+Single-command deploy — builds backend (PHP-FPM), frontend (React → nginx), and runs Postgres + Redis:
+
+```bash
+# 1. Create production .env from template
+cp .env.prod.example .env.prod
+
+# 2. Fill in APP_KEY (generate once)
+cd backend && php artisan key:generate --show   # copy the output
+cd ..
+# Edit .env.prod: set APP_KEY, DB_PASSWORD, APP_URL
+
+# 3. Run migrations (first deploy only)
+docker compose -f docker-compose.prod.yml --env-file .env.prod run --rm \
+  backend php artisan migrate --force
+
+# 4. Start all services
+docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
+
+# App is available at http://yourdomain.com (port 80)
+# Health check: http://yourdomain.com/api/health
+```
+
+**Architecture on the server:**
+
+```
+Internet :80 → nginx (React SPA + /api proxy)
+                        ↓ FastCGI
+                   PHP-FPM (Laravel)
+                   ↙           ↘
+             PostgreSQL       Redis
+             (pgdata vol)   (redisdata vol)
+```
+
 ## AI Usage
 
 This project was built with assistance from Claude (Anthropic) as a coding assistant. Claude helped with:
@@ -107,5 +142,4 @@ All generated code was reviewed, tested, and verified against the requirements.
 ## Known Limitations (intentional)
 
 - **No authentication** — single-user app; auth (Sanctum + users table) is out of scope
-- **No production deployment** — intentionally omitted; production setup would use Docker + nginx + supervisor or Forge/Vapor
 - **No production monitoring** — locally Monolog → stderr; production would use Sentry + Telescope + Prometheus/Grafana

@@ -3,8 +3,10 @@ import type { AddBookPayload, Book, BooksResponse } from '../types/book'
 const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 
 export class ValidationError extends Error {
-  constructor(public readonly errors: Record<string, string[]>) {
+  readonly errors: Record<string, string[]>
+  constructor(errors: Record<string, string[]>) {
     super('Validation failed')
+    this.errors = errors
   }
 }
 

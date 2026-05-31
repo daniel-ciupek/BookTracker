@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Star } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 interface Props {
   value: number | null
@@ -18,47 +19,53 @@ export function StarRating({ value, count, readonly = false, onRate }: Props) {
       <span className="inline-flex items-center gap-1 text-sm">
         <span className="flex items-center gap-0.5">
           {Array.from({ length: 5 }, (_, i) => (
-            <Star 
-              key={i} 
-              size={16}
-              className={i < Math.round(display) ? 'fill-amber-400 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]' : 'fill-slate-200/50 text-slate-300 dark:fill-slate-800 dark:text-slate-700'} 
+            <Star
+              key={i}
+              size={14}
+              className={i < Math.round(display) ? 'fill-amber-400 text-amber-400' : 'fill-transparent text-slate-300 dark:text-white/15'}
               strokeWidth={1.5}
+              style={i < Math.round(display) ? { filter: 'drop-shadow(0 0 4px rgba(245,158,11,0.5))' } : {}}
             />
           ))}
         </span>
         {value !== null && (
-          <span className="text-slate-600 dark:text-slate-300 font-bold ml-1 drop-shadow-sm">
+          <span className="font-mono text-xs font-medium text-slate-500 dark:text-white/60 ml-0.5">
             {value.toFixed(1)}
-            {count !== undefined && <span className="ml-1 font-medium opacity-70">({count})</span>}
+            {count !== undefined && <span className="ml-1 opacity-60">({count})</span>}
           </span>
         )}
-        {value === null && <span className="text-slate-400 dark:text-slate-500 text-xs ml-1 font-medium">Brak ocen</span>}
+        {value === null && <span className="font-mono text-[10px] text-slate-400 dark:text-white/25 ml-0.5">Brak ocen</span>}
       </span>
     )
   }
 
   return (
     <span
-      className="inline-flex items-center gap-0 sm:gap-0.5"
+      className="inline-flex items-center gap-0"
       onMouseLeave={() => setHovered(null)}
       onClick={(e) => e.stopPropagation()}
     >
       {Array.from({ length: 5 }, (_, i) => {
         const star = i + 1
+        const isActive = star <= display
         return (
-          <button
+          <motion.button
             key={star}
             type="button"
             aria-label={`Ocena ${star}`}
             onMouseEnter={() => setHovered(star)}
             onClick={() => onRate?.(value === star ? null : star)}
-            className={[
-              'p-1.5 sm:p-1 transition-all duration-300 hover:scale-125 focus:outline-none',
-              star <= display ? 'text-amber-400 drop-shadow-[0_0_10px_rgba(251,191,36,0.8)]' : 'text-slate-300 dark:text-slate-600 hover:text-amber-300',
-            ].join(' ')}
+            whileTap={{ scale: 1.3 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+            className="p-1 focus:outline-none"
           >
-            <Star size={24} className={star <= display ? 'fill-amber-400' : 'fill-transparent'} strokeWidth={1.5} />
-          </button>
+            <Star
+              size={20}
+              strokeWidth={1.5}
+              className={isActive ? 'fill-amber-400 text-amber-400' : 'fill-transparent text-slate-300 dark:text-white/20'}
+              style={isActive ? { filter: 'drop-shadow(0 0 4px rgba(245,158,11,0.6))' } : {}}
+            />
+          </motion.button>
         )
       })}
     </span>

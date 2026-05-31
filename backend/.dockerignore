@@ -1,0 +1,13 @@
+vendor/
+.env.production
+storage/logs/*
+bootstrap/cache/*
+*.pem
+*.key
+tests/
+phpstan.neon
+pint.json
+phpunit.xml
+.phpunit.result.cache
+.phpunit.cache/
+node_modules/

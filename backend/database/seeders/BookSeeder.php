@@ -10,7 +10,7 @@ class BookSeeder extends Seeder
 {
     public function run(): void
     {
-        $count = (int) env('SEED_COUNT', 50);
+        $count = (int) env('SEED_COUNT', 10000);
         $faker = FakerFactory::create();
         $chunkSize = 1000;
         $batch = [];

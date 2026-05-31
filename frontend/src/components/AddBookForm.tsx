@@ -1,12 +1,13 @@
+import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { ValidationError } from '../api/books'
+import { ValidationError, upsertRating } from '../api/books'
 import { useAddBook } from '../hooks/useBooks'
 import type { AddBookPayload } from '../types/book'
 import { GENRES } from '../lib/constants'
 import { isValidIsbn } from '../lib/isbn'
-import { BookPlus, Plus } from 'lucide-react'
+import { BookPlus, Plus, Star } from 'lucide-react'
 import { motion, AnimatePresence, useAnimation } from 'framer-motion'
 
 const schema = z.object({
@@ -42,11 +43,17 @@ export function AddBookForm() {
 
   const mutation = useAddBook()
   const cardControls = useAnimation()
+  const [rating, setRating] = useState(0)
+  const [hoverRating, setHoverRating] = useState(0)
 
   async function onSubmit(data: FormInput) {
     try {
-      await mutation.mutateAsync(data as AddBookPayload)
+      const book = await mutation.mutateAsync(data as AddBookPayload)
+      if (rating > 0) {
+        await upsertRating(book.id, rating)
+      }
       reset()
+      setRating(0)
       await cardControls.start({
         borderColor: ['rgba(255,255,255,0.08)', 'rgba(232,121,249,0.6)', 'rgba(255,255,255,0.08)'],
         transition: { duration: 0.6 },
@@ -113,6 +120,46 @@ export function AddBookForm() {
             ))}
           </select>
         </Field>
+      </div>
+
+      <div>
+        <label className="mb-1.5 block text-[10px] font-bold tracking-widest text-slate-400 dark:text-white/35 uppercase">
+          Ocena (1–5)
+        </label>
+        <div className="flex items-center gap-1" onMouseLeave={() => setHoverRating(0)}>
+          {Array.from({ length: 5 }, (_, i) => {
+            const star = i + 1
+            const isActive = star <= (hoverRating || rating)
+            return (
+              <motion.button
+                key={star}
+                type="button"
+                aria-label={`Ocena ${star}`}
+                onMouseEnter={() => setHoverRating(star)}
+                onClick={() => setRating(rating === star ? 0 : star)}
+                whileTap={{ scale: 1.3 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                className="p-0.5 focus:outline-none"
+              >
+                <Star
+                  size={22}
+                  strokeWidth={1.5}
+                  className={isActive ? 'fill-amber-400 text-amber-400' : 'fill-transparent text-slate-300 dark:text-white/20'}
+                  style={isActive ? { filter: 'drop-shadow(0 0 4px rgba(245,158,11,0.6))' } : {}}
+                />
+              </motion.button>
+            )
+          })}
+          {rating > 0 && (
+            <button
+              type="button"
+              onClick={() => setRating(0)}
+              className="ml-1 font-mono text-[11px] text-slate-400 dark:text-white/25 hover:text-red-400 dark:hover:text-red-400 transition-colors"
+            >
+              usuń
+            </button>
+          )}
+        </div>
       </div>
 
       <motion.button

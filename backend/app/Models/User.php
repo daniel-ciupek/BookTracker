@@ -21,7 +21,25 @@ class User extends Authenticatable
     /** @return HasMany<Book, $this> */
     public function books(): HasMany
     {
-        return $this->hasMany(Book::class);
+        return $this->hasMany(Book::class, 'added_by_user_id');
+    }
+
+    /** @return HasMany<Rating, $this> */
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(Rating::class);
+    }
+
+    /** @return HasMany<Review, $this> */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    /** @return HasMany<UserBookStatus, $this> */
+    public function bookStatuses(): HasMany
+    {
+        return $this->hasMany(UserBookStatus::class);
     }
 
     /** @return array<string, string> */

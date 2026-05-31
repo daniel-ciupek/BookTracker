@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreBookRequest;
+use App\Models\Book;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,7 +15,8 @@ class BookController extends Controller
     {
         /** @var User $user */
         $user = $request->user();
-        $book = $user->books()->create($request->validated());
+        $data = array_merge($request->validated(), ['added_by_user_id' => $user->id]);
+        $book = Book::create($data);
 
         Cache::flush();
 
@@ -29,14 +31,15 @@ class BookController extends Controller
         $limit = min((int) $request->query('limit', 50), 100);
         $cursor = $request->query('cursor');
         $search = $request->query('search', '');
+        $genre = $request->query('genre', '');
 
-        $cacheKey = 'books:'.$user->id.':'.md5(serialize([$cursor, $limit, $search]));
+        $cacheKey = 'books:'.$user->id.':'.md5(serialize([$cursor, $limit, $search, $genre]));
 
-        $result = Cache::remember($cacheKey, 60, function () use ($user, $cursor, $limit, $search) {
-            $query = $user->books()->orderBy('id');
+        $result = Cache::remember($cacheKey, 60, function () use ($cursor, $limit, $search, $genre) {
+            $query = Book::query()->orderBy('books.id');
 
             if ($cursor) {
-                $query->where('id', '>', (int) $cursor);
+                $query->where('books.id', '>', (int) $cursor);
             }
 
             if ($search !== '') {
@@ -44,6 +47,10 @@ class BookController extends Controller
                     '(title ILIKE ? OR author ILIKE ?)',
                     ["%{$search}%", "%{$search}%"]
                 );
+            }
+
+            if ($genre !== '') {
+                $query->where('genre', $genre);
             }
 
             $books = $query->limit($limit + 1)->get();
@@ -59,5 +66,10 @@ class BookController extends Controller
         });
 
         return response()->json($result);
+    }
+
+    public function show(Book $book): JsonResponse
+    {
+        return response()->json($book);
     }
 }

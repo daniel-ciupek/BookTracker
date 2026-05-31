@@ -20,7 +20,7 @@ class StoreBookRequest extends FormRequest
             'author' => ['required', 'string', 'max:255'],
             'isbn' => ['nullable', 'string', 'unique:books,isbn', new ValidIsbn],
             'pages' => ['nullable', 'integer', 'min:1', 'max:99999'],
-            'rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'genre' => ['nullable', 'string', 'max:50'],
         ];
     }
 }

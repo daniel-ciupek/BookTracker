@@ -8,7 +8,6 @@ TASK.md
 
 # Laravel
 backend/vendor/
-backend/.env
 backend/storage/logs/*
 backend/bootstrap/cache/*
 backend/*.pem
@@ -25,9 +24,7 @@ frontend/coverage/
 .gitignore
 
 # Prod env (never bake into image)
-.env
 .env.prod
-backend/.env
 backend/.env.production
 
 # General

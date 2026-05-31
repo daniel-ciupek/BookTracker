@@ -1,3 +1,9 @@
+# Autor
+Daniel Ciupek
+dciupek0@gmail.com
+tel: 798277925
+
+
 # BookTracker
 
 Aplikacja full-stack do katalogowania, oceniania i recenzowania książek. Zaprojektowana z myślą o zbiorach danych liczących **do 10 milionów rekordów**.

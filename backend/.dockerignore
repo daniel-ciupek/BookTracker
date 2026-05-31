@@ -1,7 +1,5 @@
 vendor/
-.env
-.env.*
-!.env.example
+.env.production
 storage/logs/*
 bootstrap/cache/*
 *.pem

@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { ValidationError } from '../api/books'
 import { useAddBook } from '../hooks/useBooks'
+import type { AddBookPayload } from '../types/book'
 import { GENRES } from '../lib/constants'
 import { isValidIsbn } from '../lib/isbn'
 import { Plus } from 'lucide-react'
@@ -43,7 +44,7 @@ export function AddBookForm() {
 
   async function onSubmit(data: FormInput) {
     try {
-      await mutation.mutateAsync(data)
+      await mutation.mutateAsync(data as AddBookPayload)
       reset()
     } catch (err) {
       if (err instanceof ValidationError) {

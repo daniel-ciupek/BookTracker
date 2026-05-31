@@ -48,7 +48,7 @@ class BookController extends Controller
             $nextCursor = $hasMore ? $data->last()?->id : null;
 
             return [
-                'data' => $data->values(),
+                'data' => $data->values()->toArray(),
                 'next_cursor' => $nextCursor,
             ];
         });

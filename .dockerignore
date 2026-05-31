@@ -1,0 +1,29 @@
+# AI tools (local only)
+.claude
+CLAUDE.md
+GEMINI.md
+
+# Task description (local only)
+TASK.md
+
+# Laravel
+backend/vendor/
+backend/.env
+backend/storage/logs/*
+backend/bootstrap/cache/*
+backend/*.pem
+backend/*.key
+backend/certs/
+
+# React / Node
+frontend/node_modules/
+frontend/dist/
+frontend/coverage/
+
+# Git
+.git
+.gitignore
+
+# General
+.DS_Store
+*.log

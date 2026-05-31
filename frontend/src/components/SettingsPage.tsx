@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
-import { X } from 'lucide-react'
+import { X, User, Lock } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 type ApiError = { message?: string; errors?: Record<string, string[]> }
 
@@ -76,128 +77,127 @@ export function SettingsPage({ onClose }: Props) {
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4 py-6 backdrop-blur-md transition-all"
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6"
+      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)' }}
       onClick={onClose}
     >
-      <div
-        className="glass-panel relative w-full max-w-md overflow-y-auto rounded-3xl p-8"
+      <motion.div
+        initial={{ scale: 0.96, opacity: 0, y: 16 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.96, opacity: 0, y: 16 }}
+        transition={{ type: 'spring', duration: 0.4, bounce: 0.2 }}
+        className="glass-card relative w-full max-w-md overflow-y-auto rounded-2xl p-8 max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
-        <button
+        <motion.button
           type="button"
           onClick={onClose}
-          className="glass-icon-btn absolute right-5 top-5"
+          whileHover={{ rotate: 90, scale: 1.1 }}
+          transition={{ duration: 0.2 }}
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full"
+          style={{
+            background: 'rgba(255,255,255,0.06)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            color: 'rgba(255,255,255,0.6)',
+          }}
           aria-label="Zamknij"
         >
-          <X size={18} strokeWidth={2.5} />
-        </button>
+          <X size={16} strokeWidth={2.5} />
+        </motion.button>
 
-        <h2 className="mb-8 text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 drop-shadow-sm">Ustawienia</h2>
+        <h2 className="mb-7 text-xl font-extrabold tracking-tight text-white">Ustawienia</h2>
 
-        {/* Profile section */}
-        <section className="mb-8">
-          <h3 className="mb-4 text-base font-bold text-slate-800 dark:text-slate-200">Twój profil</h3>
+        <section className="mb-7">
+          <div className="flex items-center gap-2.5 mb-4">
+            <div
+              className="flex h-7 w-7 items-center justify-center rounded-lg"
+              style={{
+                background: 'rgba(168,85,247,0.12)',
+                border: '1px solid rgba(168,85,247,0.2)',
+              }}
+            >
+              <User size={13} className="text-aurora-indigo" strokeWidth={2} />
+            </div>
+            <h3 className="text-sm font-bold text-white/80">Twój profil</h3>
+          </div>
           <form onSubmit={handleProfileSubmit} className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400 drop-shadow-sm">Imię</label>
-              <input
-                type="text"
-                value={profileName}
-                onChange={(e) => setProfileName(e.target.value)}
-                className="glass-input"
-              />
-              {profileErrors['name'] && (
-                <p className="mt-1.5 pl-1 text-xs font-medium text-red-500">{profileErrors['name']}</p>
-              )}
+              <label className="mb-1.5 block text-[10px] font-bold tracking-widest text-white/35 uppercase">Imię</label>
+              <input type="text" value={profileName} onChange={(e) => setProfileName(e.target.value)} className="aurora-input" />
+              {profileErrors['name'] && <p className="mt-1.5 pl-1 text-xs font-medium text-red-400">{profileErrors['name']}</p>}
             </div>
             <div>
-              <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400 drop-shadow-sm">E-mail</label>
-              <input
-                type="email"
-                value={profileEmail}
-                onChange={(e) => setProfileEmail(e.target.value)}
-                className="glass-input"
-              />
-              {profileErrors['email'] && (
-                <p className="mt-1.5 pl-1 text-xs font-medium text-red-500">{profileErrors['email']}</p>
-              )}
+              <label className="mb-1.5 block text-[10px] font-bold tracking-widest text-white/35 uppercase">E-mail</label>
+              <input type="email" value={profileEmail} onChange={(e) => setProfileEmail(e.target.value)} className="aurora-input" />
+              {profileErrors['email'] && <p className="mt-1.5 pl-1 text-xs font-medium text-red-400">{profileErrors['email']}</p>}
             </div>
-            {profileErrors['_'] && (
-              <p className="text-sm font-medium text-red-500">{profileErrors['_']}</p>
-            )}
-            {profileSuccess && <p className="text-sm font-medium text-emerald-500">{profileSuccess}</p>}
-            <button
+            {profileErrors['_'] && <p className="text-sm font-medium text-red-400">{profileErrors['_']}</p>}
+            {profileSuccess && <p className="text-sm font-medium text-emerald-400">{profileSuccess}</p>}
+            <motion.button
               type="submit"
               disabled={profileLoading}
-              className="glass-button w-full mt-2"
+              whileHover={profileLoading ? {} : { y: -1 }}
+              whileTap={profileLoading ? {} : { scale: 0.98 }}
+              className="glow-button w-full rounded-xl py-2.5 text-sm font-bold flex items-center justify-center gap-2"
             >
-              {profileLoading ? 'Zapisywanie…' : 'Zapisz profil'}
-            </button>
+              {profileLoading ? (
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+              ) : 'Zapisz profil'}
+            </motion.button>
           </form>
         </section>
 
-        <hr className="mb-8 border-slate-200/50 dark:border-slate-700/50" />
+        <div className="mb-7 h-px" style={{ background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.07), transparent)' }} />
 
-        {/* Password section */}
         <section>
-          <h3 className="mb-4 text-base font-bold text-slate-800 dark:text-slate-200">Zmień hasło</h3>
+          <div className="flex items-center gap-2.5 mb-4">
+            <div
+              className="flex h-7 w-7 items-center justify-center rounded-lg"
+              style={{
+                background: 'rgba(168,85,247,0.12)',
+                border: '1px solid rgba(168,85,247,0.2)',
+              }}
+            >
+              <Lock size={13} className="text-aurora-indigo" strokeWidth={2} />
+            </div>
+            <h3 className="text-sm font-bold text-white/80">Zmień hasło</h3>
+          </div>
           <form onSubmit={handlePasswordSubmit} className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400 drop-shadow-sm">
-                Obecne hasło
-              </label>
-              <input
-                type="password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                className="glass-input"
-              />
-              {passwordErrors['current_password'] && (
-                <p className="mt-1.5 pl-1 text-xs font-medium text-red-500">{passwordErrors['current_password']}</p>
-              )}
+              <label className="mb-1.5 block text-[10px] font-bold tracking-widest text-white/35 uppercase">Obecne hasło</label>
+              <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="aurora-input" />
+              {passwordErrors['current_password'] && <p className="mt-1.5 pl-1 text-xs font-medium text-red-400">{passwordErrors['current_password']}</p>}
             </div>
             <div>
-              <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400 drop-shadow-sm">Nowe hasło</label>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="min. 8 znaków"
-                className="glass-input"
-              />
-              {passwordErrors['password'] && (
-                <p className="mt-1.5 pl-1 text-xs font-medium text-red-500">{passwordErrors['password']}</p>
-              )}
+              <label className="mb-1.5 block text-[10px] font-bold tracking-widest text-white/35 uppercase">Nowe hasło</label>
+              <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="min. 8 znaków" className="aurora-input" />
+              {passwordErrors['password'] && <p className="mt-1.5 pl-1 text-xs font-medium text-red-400">{passwordErrors['password']}</p>}
             </div>
             <div>
-              <label className="mb-1.5 block text-[13px] font-bold tracking-wide text-slate-600 uppercase dark:text-slate-400 drop-shadow-sm">
-                Powtórz nowe hasło
-              </label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="glass-input"
-              />
-              {passwordErrors['confirm'] && (
-                <p className="mt-1.5 pl-1 text-xs font-medium text-red-500">{passwordErrors['confirm']}</p>
-              )}
+              <label className="mb-1.5 block text-[10px] font-bold tracking-widest text-white/35 uppercase">Powtórz nowe hasło</label>
+              <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="aurora-input" />
+              {passwordErrors['confirm'] && <p className="mt-1.5 pl-1 text-xs font-medium text-red-400">{passwordErrors['confirm']}</p>}
             </div>
-            {passwordErrors['_'] && (
-              <p className="text-sm font-medium text-red-500">{passwordErrors['_']}</p>
-            )}
-            {passwordSuccess && <p className="text-sm font-medium text-emerald-500">{passwordSuccess}</p>}
-            <button
+            {passwordErrors['_'] && <p className="text-sm font-medium text-red-400">{passwordErrors['_']}</p>}
+            {passwordSuccess && <p className="text-sm font-medium text-emerald-400">{passwordSuccess}</p>}
+            <motion.button
               type="submit"
               disabled={passwordLoading}
-              className="glass-button w-full mt-2"
+              whileHover={passwordLoading ? {} : { y: -1 }}
+              whileTap={passwordLoading ? {} : { scale: 0.98 }}
+              className="glow-button w-full rounded-xl py-2.5 text-sm font-bold flex items-center justify-center gap-2"
             >
-              {passwordLoading ? 'Zmienianie…' : 'Zmień hasło'}
-            </button>
+              {passwordLoading ? (
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+              ) : 'Zmień hasło'}
+            </motion.button>
           </form>
         </section>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }

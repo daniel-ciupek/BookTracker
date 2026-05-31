@@ -8,7 +8,7 @@ import { useAuth } from '../hooks/useAuth'
 import { ReviewCard } from './ReviewCard'
 import { StarRating } from './StarRating'
 import { ImageWithFallback } from './ImageWithFallback'
-import { X, Check, Library } from 'lucide-react'
+import { X, Check, BookOpen } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const STATUS_LABELS: Record<ReadingStatus, string> = {
@@ -17,10 +17,19 @@ const STATUS_LABELS: Record<ReadingStatus, string> = {
   read: 'Przeczytane',
 }
 
+const STATUS_ACTIVE_CLASS: Record<ReadingStatus, string> = {
+  want_to_read: 'bg-sky-100 dark:bg-sky-950/40 border-sky-300 dark:border-sky-700/60 text-sky-700 dark:text-sky-300',
+  reading: 'bg-purple-100 dark:bg-purple-950/40 border-purple-300 dark:border-purple-700/60 text-purple-700 dark:text-purple-300',
+  read: 'bg-emerald-100 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-700/60 text-emerald-700 dark:text-emerald-300',
+}
+
 interface Props {
   book: Book
   onClose: () => void
 }
+
+const titleInitials = (title: string) =>
+  title.split(' ').slice(0, 2).map((w) => w[0]).join('').toUpperCase()
 
 export function BookDetailModal({ book, onClose }: Props) {
   const { user } = useAuth()
@@ -44,20 +53,15 @@ export function BookDetailModal({ book, onClose }: Props) {
   const deleteStatus = useDeleteStatus(book.id)
 
   useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
+    const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     document.addEventListener('keydown', handleKey)
     return () => document.removeEventListener('keydown', handleKey)
   }, [onClose])
 
   function handleRate(v: number | null) {
     setUserRating(v)
-    if (v === null) {
-      deleteRating.mutate()
-    } else {
-      upsertRating.mutate(v)
-    }
+    if (v === null) deleteRating.mutate()
+    else upsertRating.mutate(v)
   }
 
   function handleStatus(s: ReadingStatus) {
@@ -73,18 +77,11 @@ export function BookDetailModal({ book, onClose }: Props) {
   async function handleReviewSubmit(e: React.FormEvent) {
     e.preventDefault()
     const body = editingReview ? editingReview.body : reviewBody
-    if (!body.trim()) {
-      setReviewError('Recenzja nie może być pusta.')
-      return
-    }
+    if (!body.trim()) { setReviewError('Recenzja nie może być pusta.'); return }
     setReviewError('')
     await upsertReview.mutateAsync(body)
     setReviewBody('')
     setEditingReview(null)
-  }
-
-  async function handleDeleteReview() {
-    await deleteReview.mutateAsync()
   }
 
   const coverUrl = book.isbn ? `https://covers.openlibrary.org/b/isbn/${book.isbn}-M.jpg` : null
@@ -94,137 +91,158 @@ export function BookDetailModal({ book, onClose }: Props) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/30 dark:bg-black/60 backdrop-blur-sm px-4 py-6 sm:p-6 transition-all"
+      className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 sm:p-6"
+      style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)' }}
       onClick={onClose}
     >
       <motion.div
-        initial={{ scale: 0.95, opacity: 0, y: 20 }}
+        initial={{ scale: 0.96, opacity: 0, y: 16 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.95, opacity: 0, y: 20 }}
-        transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
+        exit={{ scale: 0.96, opacity: 0, y: 16 }}
+        transition={{ type: 'spring', duration: 0.4, bounce: 0.2 }}
         ref={containerRef}
-        className="relative flex max-h-full w-full max-w-3xl flex-col overflow-hidden rounded-[24px] bg-white/95 dark:bg-[#0a0a0a]/90 backdrop-blur-3xl shadow-[0_30px_60px_rgba(0,0,0,0.12)] dark:shadow-[0_30px_60px_rgba(0,0,0,0.7)] ring-1 ring-slate-200 dark:ring-white/10"
+        className="relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl glass-card"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Subtle top glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-32 bg-indigo-500/10 dark:bg-indigo-500/5 blur-3xl pointer-events-none rounded-t-[24px]" />
-
-        <button
+        {/* close button */}
+        <motion.button
           type="button"
           onClick={onClose}
-          className="absolute right-5 top-5 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100/50 text-slate-500 hover:bg-slate-200 dark:bg-slate-800/50 dark:text-slate-400 dark:hover:bg-slate-700 transition-colors backdrop-blur-md"
+          whileHover={{ rotate: 90, scale: 1.1 }}
+          transition={{ duration: 0.2 }}
+          className="absolute right-4 top-4 z-20 flex h-8 w-8 items-center justify-center rounded-full
+            bg-black/[0.06] dark:bg-white/[0.06]
+            border border-black/[0.08] dark:border-white/[0.08]
+            text-slate-500 dark:text-white/60
+            hover:bg-black/[0.1] dark:hover:bg-white/[0.1]"
           aria-label="Zamknij"
         >
-          <X size={18} strokeWidth={2.5} />
-        </button>
+          <X size={16} strokeWidth={2.5} />
+        </motion.button>
 
-        <div className="overflow-y-auto relative z-10">
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 p-6 sm:p-10 items-start">
-            {/* Cover */}
+        <div className="overflow-y-auto">
+          {/* header */}
+          <div className="flex flex-col sm:flex-row gap-5 sm:gap-7 p-6 sm:p-8 items-start">
             <ImageWithFallback
               src={coverUrl || undefined}
               alt={`Okładka: ${book.title}`}
-              className="h-56 w-36 sm:h-64 sm:w-44 flex-shrink-0 rounded-xl object-cover shadow-xl ring-1 ring-black/10 dark:ring-white/10"
+              className="h-[160px] w-[110px] flex-shrink-0 rounded-xl object-cover shadow-xl"
               fallback={
-                <div className="relative flex h-56 w-36 sm:h-64 sm:w-44 flex-shrink-0 items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-900 ring-1 ring-inset ring-slate-200 dark:ring-white/5 overflow-hidden">
-                  <div className="absolute inset-0 bg-slate-200/50 dark:bg-slate-800/50 animate-pulse" />
-                  <Library size={36} className="text-slate-400 dark:text-slate-600 z-10" strokeWidth={1} />
+                <div
+                  className="flex h-[160px] w-[110px] flex-shrink-0 items-center justify-center rounded-xl
+                    text-xl font-bold select-none shadow-xl
+                    bg-purple-100 dark:bg-purple-950/40
+                    text-purple-600 dark:text-purple-300
+                    border border-purple-200 dark:border-purple-800/40"
+                >
+                  {titleInitials(book.title)}
                 </div>
               }
             />
 
-            {/* Info */}
-            <div className="min-w-0 flex-1 pt-2 sm:pt-4">
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight mb-2">
+            <div className="min-w-0 flex-1 pt-1">
+              <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight mb-1">
                 {book.title}
               </h2>
-              <p className="text-lg font-medium text-slate-500 dark:text-slate-400 mb-6">
+              <p className="text-base font-medium mb-4 text-indigo-600 dark:text-indigo-400">
                 {book.author}
               </p>
 
-              <div className="flex flex-wrap gap-2 mb-6">
+              <div className="flex flex-wrap gap-2 mb-4">
                 {book.genre && (
-                  <span className="rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
-                    {book.genre}
+                  <span className="font-mono text-[10px] font-semibold rounded-full px-2.5 py-1
+                    bg-purple-100 dark:bg-purple-950/40
+                    border border-purple-200 dark:border-purple-800/40
+                    text-purple-700 dark:text-purple-300">
+                    {book.genre.toUpperCase()}
                   </span>
                 )}
                 {book.pages && (
-                  <span className="rounded-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
-                    {book.pages} stron
+                  <span className="font-mono text-[10px] font-semibold rounded-full px-2.5 py-1
+                    bg-slate-100 dark:bg-white/[0.05]
+                    border border-slate-200 dark:border-white/[0.08]
+                    text-slate-500 dark:text-white/50">
+                    {book.pages} STR.
                   </span>
                 )}
               </div>
 
               {book.added_by && (
-                <p className="text-xs font-medium text-slate-400 dark:text-slate-500">
-                  Dodane przez: <span className="text-slate-700 dark:text-slate-300">{book.added_by.name}</span>
+                <p className="font-mono text-[10px] text-slate-400 dark:text-white/30">
+                  dodane przez: <span className="text-slate-500 dark:text-white/50">{book.added_by.name}</span>
                 </p>
               )}
             </div>
           </div>
 
-          <div className="mx-6 sm:mx-10 h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-800 to-transparent" />
+          {/* divider */}
+          <div className="mx-6 sm:mx-8 h-px bg-black/[0.06] dark:bg-white/[0.06]" />
 
-          {/* Interaction Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 p-6 sm:p-10">
-            {/* Ratings */}
-            <div className="space-y-6">
+          {/* ratings + status */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6 sm:p-8">
+            <div className="space-y-5">
               <div>
-                <h3 className="mb-3 text-[11px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Średnia ocena</h3>
+                <h3 className="mb-2.5 font-mono text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-white/35">
+                  Średnia ocena
+                </h3>
                 <StarRating value={book.avg_rating} count={book.ratings_count} readonly />
               </div>
               <div>
-                <h3 className="mb-3 text-[11px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Twoja ocena</h3>
+                <h3 className="mb-2.5 font-mono text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-white/35">
+                  Twoja ocena
+                </h3>
                 <StarRating value={userRating} onRate={handleRate} />
               </div>
             </div>
 
-            {/* Status */}
             <div>
-              <h3 className="mb-3 text-[11px] font-bold tracking-widest text-slate-400 dark:text-slate-500 uppercase">Status czytania</h3>
-              <div className="flex flex-col gap-2.5">
+              <h3 className="mb-2.5 font-mono text-[10px] font-bold tracking-widest uppercase text-slate-400 dark:text-white/35">
+                Status czytania
+              </h3>
+              <div className="flex flex-col gap-2">
                 {(Object.keys(STATUS_LABELS) as ReadingStatus[]).map((s) => (
                   <button
                     key={s}
                     type="button"
                     onClick={() => handleStatus(s)}
                     className={[
-                      'group relative flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-200 border',
+                      'flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-semibold border transition-all duration-200',
                       userStatus === s
-                        ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 shadow-sm'
-                        : 'border-slate-200 dark:border-slate-800/80 bg-white/50 dark:bg-slate-900/50 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/80',
+                        ? STATUS_ACTIVE_CLASS[s]
+                        : 'bg-black/[0.03] dark:bg-white/[0.03] border-black/[0.07] dark:border-white/[0.07] text-slate-600 dark:text-white/50 hover:bg-black/[0.06] dark:hover:bg-white/[0.06]',
                     ].join(' ')}
                   >
                     <span>{STATUS_LABELS[s]}</span>
-                    {userStatus === s && <Check size={16} strokeWidth={2.5} />}
+                    {userStatus === s && <Check size={14} strokeWidth={2.5} />}
                   </button>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* Reviews Section */}
-          <div className="bg-slate-50/50 dark:bg-slate-900/30 p-6 sm:p-10 border-t border-slate-100 dark:border-slate-800/50">
-            <h3 className="mb-6 text-lg font-bold text-slate-900 dark:text-white">
-              Recenzje <span className="text-slate-400 font-normal">({book.reviews_count})</span>
+          {/* reviews section */}
+          <div className="p-6 sm:p-8 border-t border-black/[0.06] dark:border-white/[0.06] bg-black/[0.02] dark:bg-black/[0.15]">
+            <h3 className="mb-5 text-base font-bold text-slate-800 dark:text-white">
+              Recenzje{' '}
+              <span className="font-mono text-xs text-slate-400 dark:text-white/30">({book.reviews_count})</span>
             </h3>
 
-            {/* Add/Edit review form */}
             {!editingReview && !myReview && (
-              <form onSubmit={handleReviewSubmit} className="mb-8">
+              <form onSubmit={handleReviewSubmit} className="mb-6">
                 <textarea
                   value={reviewBody}
                   onChange={(e) => setReviewBody(e.target.value)}
                   placeholder="Napisz recenzję…"
                   rows={3}
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0a0a0a] px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
+                  className="aurora-textarea"
                 />
-                {reviewError && <p className="mt-2 pl-2 text-xs font-bold text-red-500">{reviewError}</p>}
+                {reviewError && (
+                  <p className="mt-2 pl-1 text-xs font-medium text-red-500 dark:text-red-400">{reviewError}</p>
+                )}
                 <button
                   type="submit"
                   disabled={upsertReview.isPending}
-                  className="mt-3 rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                  className="mt-3 glow-button rounded-xl px-5 py-2 text-sm font-semibold"
                 >
                   {upsertReview.isPending ? 'Zapisywanie…' : 'Dodaj recenzję'}
                 </button>
@@ -232,38 +250,30 @@ export function BookDetailModal({ book, onClose }: Props) {
             )}
 
             {editingReview && (
-              <form onSubmit={handleReviewSubmit} className="mb-8">
+              <form onSubmit={handleReviewSubmit} className="mb-6">
                 <textarea
                   value={editingReview.body}
                   onChange={(e) => setEditingReview({ ...editingReview, body: e.target.value })}
                   rows={3}
-                  className="w-full rounded-xl border border-indigo-500/50 bg-white dark:bg-[#0a0a0a] px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
+                  className="aurora-textarea"
                 />
                 <div className="mt-3 flex gap-3">
-                  <button
-                    type="submit"
-                    disabled={upsertReview.isPending}
-                    className="rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors disabled:opacity-50"
-                  >
+                  <button type="submit" disabled={upsertReview.isPending} className="glow-button rounded-xl px-5 py-2 text-sm font-semibold">
                     {upsertReview.isPending ? 'Zapisywanie…' : 'Zapisz zmiany'}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setEditingReview(null)}
-                    className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0a0a0a] px-6 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
-                  >
+                  <button type="button" onClick={() => setEditingReview(null)} className="glass-button-secondary rounded-xl px-5 py-2 text-sm font-semibold">
                     Anuluj
                   </button>
                 </div>
               </form>
             )}
 
-            {/* Reviews list */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               {allReviews.length === 0 && (
-                <p className="rounded-2xl border border-dashed border-slate-300 dark:border-slate-800 bg-white/50 dark:bg-[#0a0a0a]/50 p-10 text-center text-sm font-medium text-slate-500 dark:text-slate-400">
-                  Brak recenzji. Bądź pierwszy!
-                </p>
+                <div className="glass-card p-8 text-center border-dashed">
+                  <BookOpen size={20} className="mx-auto mb-2 text-slate-300 dark:text-white/20" strokeWidth={1.5} />
+                  <p className="text-sm font-medium text-slate-400 dark:text-white/30">Brak recenzji. Bądź pierwszy!</p>
+                </div>
               )}
               {allReviews.map((review) => (
                 <ReviewCard
@@ -271,7 +281,7 @@ export function BookDetailModal({ book, onClose }: Props) {
                   review={review}
                   currentUserId={user?.id}
                   onEdit={(r) => setEditingReview(r)}
-                  onDelete={() => void handleDeleteReview()}
+                  onDelete={() => void deleteReview.mutateAsync()}
                 />
               ))}
             </div>
@@ -281,7 +291,7 @@ export function BookDetailModal({ book, onClose }: Props) {
                 type="button"
                 onClick={() => void fetchNextPage()}
                 disabled={isFetchingNextPage}
-                className="mt-6 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0a0a0a] px-6 py-3 text-sm font-semibold text-indigo-600 dark:text-indigo-400 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors disabled:opacity-50"
+                className="mt-5 w-full glass-button-secondary rounded-xl py-2.5 text-sm font-semibold"
               >
                 {isFetchingNextPage ? 'Ładowanie…' : 'Załaduj więcej recenzji'}
               </button>

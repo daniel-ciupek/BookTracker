@@ -1,5 +1,6 @@
 import type { Review } from '../types/review'
 import { Edit2, Trash2 } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 interface Props {
   review: Review
@@ -17,47 +18,65 @@ export function ReviewCard({ review, currentUserId, onEdit, onDelete }: Props) {
     .toUpperCase()
 
   const date = new Date(review.created_at).toLocaleDateString('pl-PL', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
+    year: 'numeric', month: 'short', day: 'numeric',
   })
 
   const isOwn = currentUserId === review.user.id
 
   return (
-    <div className="rounded-2xl border border-white/40 bg-white/40 p-5 shadow-sm backdrop-blur-md transition-all hover:bg-white/60 dark:border-white/5 dark:bg-slate-900/40 dark:hover:bg-slate-900/60">
-      <div className="mb-4 flex items-center justify-between gap-3">
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25 }}
+      className="glass-card p-4 rounded-xl"
+    >
+      <div className="mb-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500/10 text-sm font-extrabold text-indigo-600 shadow-inner backdrop-blur-md dark:bg-indigo-400/10 dark:text-indigo-300 border border-indigo-200/50 dark:border-indigo-400/20">
+          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold
+            bg-purple-100 dark:bg-purple-950/50
+            text-purple-700 dark:text-purple-300
+            border border-purple-200 dark:border-purple-800/40">
             {initials}
           </div>
           <div>
-            <p className="text-sm font-extrabold text-slate-900 dark:text-slate-100 drop-shadow-sm">{review.user.name}</p>
-            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">{date}</p>
+            <p className="text-sm font-bold text-slate-800 dark:text-white">{review.user.name}</p>
+            <p className="font-mono text-[10px] text-slate-400 dark:text-white/30">{date}</p>
           </div>
         </div>
         {isOwn && (
-          <div className="flex gap-2">
-            <button
+          <div className="flex gap-1.5">
+            <motion.button
               type="button"
               onClick={() => onEdit?.(review)}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-white/50 text-indigo-600 shadow-sm backdrop-blur-md transition-all hover:-translate-y-0.5 hover:bg-white/80 dark:bg-slate-800/50 dark:text-indigo-400 dark:hover:bg-slate-700/80 border border-white/40 dark:border-white/5"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="flex h-7 w-7 items-center justify-center rounded-lg
+                bg-indigo-50 dark:bg-indigo-950/40
+                border border-indigo-200 dark:border-indigo-800/40
+                text-indigo-600 dark:text-indigo-400"
               aria-label="Edytuj"
             >
-              <Edit2 size={14} strokeWidth={2.5} />
-            </button>
-            <button
+              <Edit2 size={12} strokeWidth={2.5} />
+            </motion.button>
+            <motion.button
               type="button"
               onClick={() => onDelete?.(review.id)}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-white/50 text-red-500 shadow-sm backdrop-blur-md transition-all hover:-translate-y-0.5 hover:bg-red-50 dark:bg-slate-800/50 dark:text-red-400 dark:hover:bg-slate-700/80 border border-white/40 dark:border-white/5"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="flex h-7 w-7 items-center justify-center rounded-lg
+                bg-red-50 dark:bg-red-950/40
+                border border-red-200 dark:border-red-800/40
+                text-red-500 dark:text-red-400"
               aria-label="Usuń"
             >
-              <Trash2 size={14} strokeWidth={2.5} />
-            </button>
+              <Trash2 size={12} strokeWidth={2.5} />
+            </motion.button>
           </div>
         )}
       </div>
-      <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700 dark:text-slate-300 font-medium">{review.body}</p>
-    </div>
+      <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-600 dark:text-white/65">
+        {review.body}
+      </p>
+    </motion.div>
   )
 }

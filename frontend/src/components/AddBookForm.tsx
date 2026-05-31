@@ -31,7 +31,7 @@ export function AddBookForm() {
     reset,
     setError,
     formState: { errors, isSubmitting },
-  } = useForm<FormInput, unknown, FormOutput>({ resolver: zodResolver(schema) })
+  } = useForm({ resolver: zodResolver(schema) })
 
   const mutation = useAddBook()
 
@@ -58,7 +58,7 @@ export function AddBookForm() {
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
       <h2 className="mb-2 text-lg font-extrabold tracking-tight text-slate-800 dark:text-slate-100 drop-shadow-sm">Dodaj książkę</h2>
 
-      <Field label="Tytuł *" error={errors.title?.message}>
+      <Field label="Tytuł *" error={errors.title?.message as string}>
         <input
           {...register('title')}
           className={input(!!errors.title)}
@@ -66,7 +66,7 @@ export function AddBookForm() {
         />
       </Field>
 
-      <Field label="Autor *" error={errors.author?.message}>
+      <Field label="Autor *" error={errors.author?.message as string}>
         <input
           {...register('author')}
           className={input(!!errors.author)}
@@ -74,7 +74,7 @@ export function AddBookForm() {
         />
       </Field>
 
-      <Field label="ISBN" error={errors.isbn?.message}>
+      <Field label="ISBN" error={errors.isbn?.message as string}>
         <input
           {...register('isbn')}
           className={input(!!errors.isbn)}
@@ -83,7 +83,7 @@ export function AddBookForm() {
       </Field>
 
       <div className="grid grid-cols-2 gap-4">
-        <Field label="Liczba stron" error={errors.pages?.message}>
+        <Field label="Liczba stron" error={errors.pages?.message as string}>
           <input
             {...register('pages')}
             type="number"
@@ -94,7 +94,7 @@ export function AddBookForm() {
           />
         </Field>
 
-        <Field label="Gatunek" error={errors.genre?.message}>
+        <Field label="Gatunek" error={errors.genre?.message as string}>
           <select {...register('genre')} className={input(!!errors.genre)}>
             <option value="">— wybierz —</option>
             {GENRES.map((g) => (

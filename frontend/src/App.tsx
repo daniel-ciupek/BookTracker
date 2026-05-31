@@ -10,6 +10,7 @@ import { useTheme } from './components/ThemeProvider'
 import { GENRES } from './lib/constants'
 import type { Book } from './types/book'
 import { Sun, Moon, Settings, LogOut, Library } from 'lucide-react'
+import { AnimatePresence } from 'framer-motion'
 
 export default function App() {
   const { user, isLoading, logout } = useAuth()
@@ -87,9 +88,11 @@ export default function App() {
         </section>
       </main>
 
-      {selectedBook && (
-        <BookDetailModal book={selectedBook} onClose={() => setSelectedBook(null)} />
-      )}
+      <AnimatePresence>
+        {selectedBook && (
+          <BookDetailModal book={selectedBook} onClose={() => setSelectedBook(null)} />
+        )}
+      </AnimatePresence>
 
       {showSettings && <SettingsPage onClose={() => setShowSettings(false)} />}
     </div>

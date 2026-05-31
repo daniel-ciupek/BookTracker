@@ -1,9 +1,9 @@
-import React from 'react'
 import { useDeleteRating, useUpsertRating } from '../hooks/useRating'
 import type { Book, ReadingStatus } from '../types/book'
 import { StarRating } from './StarRating'
 import { ImageWithFallback } from './ImageWithFallback'
-import { Bookmark, BookOpen, CheckCircle, Book as BookIcon } from 'lucide-react'
+import { Bookmark, BookOpen, CheckCircle, Library } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 const StatusIcon = ({ status, size = 14 }: { status: ReadingStatus; size?: number }) => {
   switch (status) {
@@ -34,7 +34,10 @@ export function BookCard({ book, onOpen }: Props) {
   }
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
       className="glass-panel flex cursor-pointer items-start gap-4 rounded-2xl p-4 transition-all hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(99,102,241,0.2)] dark:hover:shadow-[0_0_20px_rgba(99,102,241,0.3)]"
       onClick={() => onOpen(book)}
       role="button"
@@ -47,8 +50,9 @@ export function BookCard({ book, onOpen }: Props) {
         alt=""
         className="h-24 w-16 flex-shrink-0 rounded-lg object-cover shadow-md dark:opacity-90"
         fallback={
-          <div className="flex h-24 w-16 flex-shrink-0 items-center justify-center rounded-lg bg-indigo-50/50 backdrop-blur-sm text-indigo-400 dark:bg-slate-800/50 dark:text-slate-500 shadow-inner border border-white/20 dark:border-white/5">
-            <BookIcon size={28} strokeWidth={1.5} />
+          <div className="relative flex h-24 w-16 flex-shrink-0 items-center justify-center rounded-lg bg-indigo-50/30 dark:bg-slate-800/30 shadow-inner border border-white/20 dark:border-white/5 overflow-hidden">
+            <div className="absolute inset-0 bg-indigo-200/20 dark:bg-indigo-500/10 animate-pulse" />
+            <Library size={24} className="text-indigo-400/70 dark:text-slate-500/70 z-10" strokeWidth={1} />
           </div>
         }
       />
@@ -82,6 +86,6 @@ export function BookCard({ book, onOpen }: Props) {
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

@@ -8,7 +8,8 @@ import { useAuth } from '../hooks/useAuth'
 import { ReviewCard } from './ReviewCard'
 import { StarRating } from './StarRating'
 import { ImageWithFallback } from './ImageWithFallback'
-import { X, Book as BookIcon, Check } from 'lucide-react'
+import { X, Check, Library } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 const STATUS_LABELS: Record<ReadingStatus, string> = {
   want_to_read: 'Chcę przeczytać',
@@ -89,11 +90,18 @@ export function BookDetailModal({ book, onClose }: Props) {
   const coverUrl = book.isbn ? `https://covers.openlibrary.org/b/isbn/${book.isbn}-M.jpg` : null
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/30 dark:bg-black/60 backdrop-blur-sm px-4 py-6 sm:p-6 transition-all"
       onClick={onClose}
     >
-      <div
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.95, opacity: 0, y: 20 }}
+        transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
         ref={containerRef}
         className="relative flex max-h-full w-full max-w-3xl flex-col overflow-hidden rounded-[24px] bg-white/95 dark:bg-[#0a0a0a]/90 backdrop-blur-3xl shadow-[0_30px_60px_rgba(0,0,0,0.12)] dark:shadow-[0_30px_60px_rgba(0,0,0,0.7)] ring-1 ring-slate-200 dark:ring-white/10"
         onClick={(e) => e.stopPropagation()}
@@ -110,7 +118,7 @@ export function BookDetailModal({ book, onClose }: Props) {
           <X size={18} strokeWidth={2.5} />
         </button>
 
-        <div className="overflow-y-auto relative z-10 scrollbar-hide">
+        <div className="overflow-y-auto relative z-10">
           {/* Header */}
           <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 p-6 sm:p-10 items-start">
             {/* Cover */}
@@ -119,8 +127,9 @@ export function BookDetailModal({ book, onClose }: Props) {
               alt={`Okładka: ${book.title}`}
               className="h-56 w-36 sm:h-64 sm:w-44 flex-shrink-0 rounded-xl object-cover shadow-xl ring-1 ring-black/10 dark:ring-white/10"
               fallback={
-                <div className="flex h-56 w-36 sm:h-64 sm:w-44 flex-shrink-0 items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-900 ring-1 ring-inset ring-slate-200 dark:ring-white/5">
-                  <BookIcon size={36} className="text-slate-300 dark:text-slate-700" strokeWidth={1} />
+                <div className="relative flex h-56 w-36 sm:h-64 sm:w-44 flex-shrink-0 items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-900 ring-1 ring-inset ring-slate-200 dark:ring-white/5 overflow-hidden">
+                  <div className="absolute inset-0 bg-slate-200/50 dark:bg-slate-800/50 animate-pulse" />
+                  <Library size={36} className="text-slate-400 dark:text-slate-600 z-10" strokeWidth={1} />
                 </div>
               }
             />
@@ -279,7 +288,7 @@ export function BookDetailModal({ book, onClose }: Props) {
             )}
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }

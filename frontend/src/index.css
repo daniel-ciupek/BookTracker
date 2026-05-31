@@ -21,6 +21,12 @@
     pointer-events: none;
   }
 
+  @keyframes mesh-pulse {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
+  }
+
   /* Dark mode mesh gradient */
   .dark body {
     background-color: #020617; /* slate-950 */
@@ -29,6 +35,8 @@
       radial-gradient(circle at 90% 80%, rgba(147, 51, 234, 0.2), transparent 35%),
       radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.1), transparent 40%);
     background-attachment: fixed;
+    background-size: 200% 200%;
+    animation: mesh-pulse 20s ease-in-out infinite alternate;
   }
 
   /* Light mode mesh gradient */
@@ -39,6 +47,8 @@
       radial-gradient(circle at 90% 80%, rgba(147, 51, 234, 0.1), transparent 35%),
       radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.05), transparent 40%);
     background-attachment: fixed;
+    background-size: 200% 200%;
+    animation: mesh-pulse 20s ease-in-out infinite alternate;
   }
 }
 

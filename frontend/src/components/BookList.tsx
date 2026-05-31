@@ -22,8 +22,12 @@ export function BookList({ search, genre, onOpenBook }: Props) {
   const virtualizer = useVirtualizer({
     count: allBooks.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 88,
+    estimateSize: () => 130,
     overscan: 10,
+    measureElement:
+      typeof window !== 'undefined'
+        ? (el) => el.getBoundingClientRect().height
+        : undefined,
   })
 
   useEffect(() => {
@@ -68,6 +72,8 @@ export function BookList({ search, genre, onOpenBook }: Props) {
         {virtualizer.getVirtualItems().map((item) => (
           <div
             key={item.key}
+            data-index={item.index}
+            ref={virtualizer.measureElement}
             style={{
               position: 'absolute',
               top: 0,

@@ -35,41 +35,103 @@ class BookController extends Controller
 
         $cacheKey = 'books:'.$user->id.':'.md5(serialize([$cursor, $limit, $search, $genre]));
 
-        $result = Cache::remember($cacheKey, 60, function () use ($cursor, $limit, $search, $genre) {
-            $query = Book::query()->orderBy('books.id');
+        $result = Cache::remember($cacheKey, 60, function () use ($user, $cursor, $limit, $search, $genre) {
+            $uid = $user->id;
+
+            $query = Book::query()
+                ->select('books.*')
+                ->selectRaw('ROUND(AVG(br.value)::numeric, 1) as avg_rating')
+                ->selectRaw('COUNT(DISTINCT br.id)::integer as ratings_count')
+                ->selectRaw('COUNT(DISTINCT brev.id)::integer as reviews_count')
+                ->selectRaw('MAX(CASE WHEN br_own.user_id = ? THEN br_own.value END)::integer as user_rating', [$uid])
+                ->selectRaw('MAX(CASE WHEN ubs.user_id = ? THEN ubs.status END) as user_status', [$uid])
+                ->selectRaw('abu.id as added_by_id')
+                ->selectRaw('abu.name as added_by_name')
+                ->leftJoin('book_ratings as br', 'br.book_id', '=', 'books.id')
+                ->leftJoin('book_reviews as brev', 'brev.book_id', '=', 'books.id')
+                ->leftJoin('book_ratings as br_own', fn ($j) => $j->on('br_own.book_id', '=', 'books.id')->where('br_own.user_id', $uid))
+                ->leftJoin('user_book_statuses as ubs', fn ($j) => $j->on('ubs.book_id', '=', 'books.id')->where('ubs.user_id', $uid))
+                ->leftJoin('users as abu', 'abu.id', '=', 'books.added_by_user_id')
+                ->groupBy('books.id', 'abu.id', 'abu.name')
+                ->orderBy('books.id');
 
             if ($cursor) {
                 $query->where('books.id', '>', (int) $cursor);
             }
 
-            if ($search !== '') {
+            if (mb_strlen($search) >= 3) {
                 $query->whereRaw(
-                    '(title ILIKE ? OR author ILIKE ?)',
+                    '(books.title ILIKE ? OR books.author ILIKE ?)',
                     ["%{$search}%", "%{$search}%"]
                 );
             }
 
             if ($genre !== '') {
-                $query->where('genre', $genre);
+                $query->where('books.genre', $genre);
             }
 
             $books = $query->limit($limit + 1)->get();
 
             $hasMore = $books->count() > $limit;
             $data = $hasMore ? $books->take($limit) : $books;
-            $nextCursor = $hasMore ? $data->last()?->id : null;
+
+            $mapped = $data->values()->map(function ($book) {
+                /** @var array<string, mixed> $arr */
+                $arr = $book->toArray();
+                $addedById = isset($arr['added_by_id']) ? (int) $arr['added_by_id'] : null;
+                $addedByName = isset($arr['added_by_name']) ? (string) $arr['added_by_name'] : null;
+                $arr['avg_rating'] = isset($arr['avg_rating']) ? (float) $arr['avg_rating'] : null;
+                $arr['ratings_count'] = (int) ($arr['ratings_count'] ?? 0);
+                $arr['reviews_count'] = (int) ($arr['reviews_count'] ?? 0);
+                $arr['user_rating'] = isset($arr['user_rating']) ? (int) $arr['user_rating'] : null;
+                $arr['user_status'] = $arr['user_status'] ?? null;
+                $arr['added_by'] = ($addedById && $addedByName) ? ['id' => $addedById, 'name' => $addedByName] : null;
+                unset($arr['added_by_id'], $arr['added_by_name']);
+
+                return $arr;
+            })->toArray();
 
             return [
-                'data' => $data->values()->toArray(),
-                'next_cursor' => $nextCursor,
+                'data' => $mapped,
+                'next_cursor' => $hasMore ? $data->last()?->id : null,
             ];
         });
 
         return response()->json($result);
     }
 
-    public function show(Book $book): JsonResponse
+    public function show(Request $request, Book $book): JsonResponse
     {
-        return response()->json($book);
+        /** @var User $user */
+        $user = $request->user();
+        $uid = $user->id;
+
+        /** @var array<string, mixed>|null $stats */
+        $stats = Book::query()
+            ->select('books.id')
+            ->selectRaw('ROUND(AVG(br.value)::numeric, 1) as avg_rating')
+            ->selectRaw('COUNT(DISTINCT br.id)::integer as ratings_count')
+            ->selectRaw('COUNT(DISTINCT brev.id)::integer as reviews_count')
+            ->selectRaw('MAX(CASE WHEN br_own.user_id = ? THEN br_own.value END)::integer as user_rating', [$uid])
+            ->selectRaw('MAX(CASE WHEN ubs.user_id = ? THEN ubs.status END) as user_status', [$uid])
+            ->leftJoin('book_ratings as br', 'br.book_id', '=', 'books.id')
+            ->leftJoin('book_reviews as brev', 'brev.book_id', '=', 'books.id')
+            ->leftJoin('book_ratings as br_own', fn ($j) => $j->on('br_own.book_id', '=', 'books.id')->where('br_own.user_id', $uid))
+            ->leftJoin('user_book_statuses as ubs', fn ($j) => $j->on('ubs.book_id', '=', 'books.id')->where('ubs.user_id', $uid))
+            ->where('books.id', $book->id)
+            ->groupBy('books.id')
+            ->first()
+            ?->toArray();
+
+        $addedBy = $book->addedBy;
+
+        return response()->json(array_merge($book->toArray(), [
+            'avg_rating' => isset($stats['avg_rating']) ? (float) $stats['avg_rating'] : null,
+            'ratings_count' => (int) ($stats['ratings_count'] ?? 0),
+            'reviews_count' => (int) ($stats['reviews_count'] ?? 0),
+            'user_rating' => isset($stats['user_rating']) ? (int) $stats['user_rating'] : null,
+            'user_status' => $stats['user_status'] ?? null,
+            'added_by' => $addedBy ? ['id' => $addedBy->id, 'name' => $addedBy->name] : null,
+        ]));
     }
 }
